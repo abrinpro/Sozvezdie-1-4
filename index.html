@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Созвездие — конструктор компетенций юного инженера (1–4 класс)</title>
+<meta name="description" content="Игра-тестирование для 1–4 классов: 8 инженерных миров, суперсилы Hard и Soft skills и индивидуальный план развития.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&family=Nunito:wght@400;600;700;800;900&display=swap">
+<style>
+:root{
+  --sky1:#7FD3F7; --sky2:#CDEFFF; --grass:#5DBB46; --grass-d:#3E8F2E; --dirt:#9A6A3F; --dirt-d:#6E4A2A;
+  --ink:#1B2440; --ink2:#46506E; --paper:#FFFDF6; --paper2:#F4F1E4; --gold:#FFC83D; --gold-d:#D69A0F;
+  --orange:#FF7A2F; --blue:#3A8DDE; --blue-d:#2463A3; --red:#E8453C; --green:#49B55A; --violet:#8B5CF6;
+  --night:#1A2350; --night2:#2A3570; --hard:#3A8DDE; --soft:#49B55A;
+  --f-head:'Russo One','Arial Black',system-ui,sans-serif; --f-body:'Nunito','Trebuchet MS',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--f-body);color:var(--ink);font-size:17px;line-height:1.45;background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 70%,#E9F8FF 100%);min-height:100vh}
+button{font-family:inherit}
+:focus-visible{outline:4px solid var(--orange);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-head);font-weight:400;margin:0;text-wrap:balance;letter-spacing:.01em}
+a{color:var(--blue-d)}
+.world{position:relative;max-width:980px;margin:0 auto;padding:18px 16px 110px}
+.clouds{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.cloud{position:absolute;width:120px;height:36px;background:#fff;opacity:.85;box-shadow:24px -16px 0 0 #fff,56px -16px 0 0 #fff,80px 0 0 0 #fff,40px 0 0 0 #fff}
+.cloud.c1{top:70px;left:-160px;animation:drift 70s linear infinite}
+.cloud.c2{top:170px;left:-160px;animation:drift 95s linear infinite;animation-delay:-40s;transform:scale(.7)}
+.cloud.c3{top:40px;left:-160px;animation:drift 120s linear infinite;animation-delay:-80s;transform:scale(.5)}
+@keyframes drift{to{left:110%}}
+.ground{position:fixed;left:0;right:0;bottom:0;height:64px;z-index:0;pointer-events:none;
+  background:linear-gradient(var(--grass) 0 18px,var(--grass-d) 18px 22px,var(--dirt) 22px);
+  background-size:100% 100%}
+.ground:before{content:"";position:absolute;inset:22px 0 0;background:repeating-linear-gradient(90deg,transparent 0 30px,rgba(0,0,0,.08) 30px 32px),repeating-linear-gradient(0deg,transparent 0 20px,rgba(0,0,0,.08) 20px 22px)}
+.top{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo .cube{width:38px;height:38px;background:var(--gold);border:3px solid var(--ink);box-shadow:inset -6px -6px 0 var(--gold-d),0 4px 0 var(--ink);display:grid;place-items:center;font-size:20px}
+.logo b{font-family:var(--f-head);font-weight:400;font-size:22px}
+.logo small{display:block;font-size:12px;font-weight:700;color:var(--ink2)}
+.pill{font-family:var(--f-head);font-size:13px;background:var(--paper);border:3px solid var(--ink);padding:3px 10px;box-shadow:0 3px 0 var(--ink)}
+.card{position:relative;z-index:1;background:var(--paper);border:3px solid var(--ink);border-radius:14px;box-shadow:0 6px 0 var(--ink);padding:22px}
+.hud{position:relative;z-index:1;display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.hud .hero-mini{width:46px;height:46px;flex:none}
+.hotbar{flex:1;display:grid;gap:3px;background:var(--ink);padding:4px;border-radius:8px}
+.hotbar i{height:18px;background:#5B6690;border-radius:2px;position:relative}
+.hotbar i.on{background:var(--gold);box-shadow:inset -3px -3px 0 var(--gold-d)}
+.hotbar i.on.lvl{background:var(--orange);box-shadow:inset -3px -3px 0 #C4551A}
+.hud-txt{font-family:var(--f-head);font-size:14px;white-space:nowrap;background:var(--paper);border:3px solid var(--ink);padding:4px 8px;box-shadow:0 3px 0 var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:10px 22px;border:3px solid var(--ink);border-radius:10px;background:var(--gold);color:var(--ink);font-family:var(--f-head);font-size:18px;cursor:pointer;box-shadow:inset -5px -5px 0 var(--gold-d),0 5px 0 var(--ink);transition:transform .08s;text-decoration:none}
+.btn:active{transform:translateY(3px);box-shadow:inset -5px -5px 0 var(--gold-d),0 2px 0 var(--ink)}
+.btn:disabled{filter:grayscale(.8) brightness(.95);cursor:not-allowed}
+.btn.green{background:var(--green);color:#fff;box-shadow:inset -5px -5px 0 var(--grass-d),0 5px 0 var(--ink)}
+.btn.blue{background:var(--blue);color:#fff;box-shadow:inset -5px -5px 0 var(--blue-d),0 5px 0 var(--ink)}
+.btn.white{background:#fff;box-shadow:inset -5px -5px 0 #D9D6C8,0 5px 0 var(--ink)}
+.btn.small{min-height:42px;font-size:15px;padding:6px 14px}
+.btn.link{background:none;border:0;box-shadow:none;color:var(--blue-d);font-family:var(--f-body);font-weight:800;font-size:16px;min-height:40px;padding:6px 8px;text-decoration:underline}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.stack{display:flex;flex-direction:column;gap:12px}
+.center{text-align:center}
+.muted{color:var(--ink2)}
+.small{font-size:14px}
+.eyebrow{font-family:var(--f-head);font-size:13px;letter-spacing:.06em;color:var(--orange);text-transform:uppercase;margin-bottom:6px}
+.fade{animation:pop .28s ease both}
+@keyframes pop{from{opacity:.4;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* старт */
+.start{display:grid;gap:20px;align-items:center}
+.start h1{font-size:clamp(34px,6vw,54px);line-height:1.05}
+.start .subt{font-family:var(--f-head);font-size:18px;color:var(--blue-d);margin-top:6px}
+.start-art{display:flex;justify-content:center;gap:10px;align-items:flex-end}
+.start-art svg{width:110px;height:auto}
+@media (min-width:760px){.start{grid-template-columns:1.2fr 1fr}}
+/* выбор */
+.seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:10px}
+.seg button{min-height:62px;border:3px solid var(--ink);border-radius:10px;background:#fff;font-family:var(--f-head);font-size:22px;cursor:pointer;box-shadow:0 4px 0 var(--ink)}
+.seg button small{display:block;font-family:var(--f-body);font-size:13px;font-weight:700;color:var(--ink2)}
+.seg button.sel{background:var(--gold);box-shadow:inset -4px -4px 0 var(--gold-d),0 4px 0 var(--ink)}
+.seg.school{grid-template-columns:1fr 1fr}
+.seg.school button{font-size:17px;padding:8px}
+.heroes{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.heroes button{border:3px solid var(--ink);border-radius:10px;background:#fff;padding:6px 2px;cursor:pointer;box-shadow:0 4px 0 var(--ink)}
+.heroes button.sel{background:var(--gold)}
+.heroes svg{width:100%;height:auto;max-width:64px}
+.inp{width:100%;min-height:52px;border:3px solid var(--ink);border-radius:10px;padding:10px 12px;font-size:18px;font-family:var(--f-body);background:#fff}
+.field{margin-top:16px}
+.label{font-family:var(--f-head);font-size:16px;margin-bottom:8px;display:block}
+/* вопрос */
+.qhead{display:flex;align-items:flex-start;gap:10px;margin:6px 0 18px}
+.qtext{font-family:var(--f-head);font-size:clamp(22px,3.6vw,30px);line-height:1.2;flex:1}
+.speak{flex:none;width:52px;height:52px;border:3px solid var(--ink);border-radius:10px;background:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 0 var(--ink)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:150px;padding:14px 10px;border:3px solid var(--ink);border-radius:12px;background:#fff;cursor:pointer;box-shadow:0 5px 0 var(--ink);font-size:17px;font-weight:800;text-align:center;line-height:1.25;transition:transform .08s}
+.tile .ic{width:72px;height:72px;display:grid;place-items:center;font-size:42px;background:var(--paper2);border:3px solid var(--ink);border-radius:8px;box-shadow:inset -5px -5px 0 #DDD8C2}
+.tile:hover{transform:translateY(-2px)}
+.tile.sel{background:var(--gold);box-shadow:inset -5px -5px 0 var(--gold-d),0 5px 0 var(--ink)}
+.tiles.picks{grid-template-columns:repeat(2,1fr)}
+.tiles.picks .tile{min-height:120px;font-size:16px}
+.tiles.picks .tile .ic{width:58px;height:58px;font-size:32px}
+@media (min-width:760px){.tiles{grid-template-columns:repeat(4,1fr)}.tiles.picks{grid-template-columns:repeat(4,1fr)}}
+.scale3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.scale3 button{min-height:150px;border:3px solid var(--ink);border-radius:12px;background:#fff;cursor:pointer;box-shadow:0 5px 0 var(--ink);font-weight:800;font-size:17px}
+.scale3 button span{display:block;font-size:52px;margin-bottom:6px}
+.scale3 button.sel{background:var(--gold)}
+.chip{display:inline-block;font-family:var(--f-head);font-size:13px;padding:4px 10px;border:3px solid var(--ink);border-radius:8px;background:var(--paper2)}
+.chip.blue{background:var(--blue);color:#fff}
+.chip.green{background:var(--green);color:#fff}
+.chip.orange{background:var(--orange);color:#fff}
+.levelup{text-align:center;padding:26px 10px}
+.levelup .big{font-family:var(--f-head);font-size:34px;color:var(--orange);-webkit-text-stroke:1px var(--ink)}
+/* результат */
+.res-head{display:grid;gap:16px;align-items:center}
+@media (min-width:760px){.res-head{grid-template-columns:auto 1fr}}
+.res-head .hero-big{width:130px;margin:0 auto}
+.sec{margin-top:18px}
+.sec-t{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sec-t .n{width:36px;height:36px;flex:none;display:grid;place-items:center;font-family:var(--f-head);font-size:18px;background:var(--orange);color:#fff;border:3px solid var(--ink);border-radius:6px;box-shadow:inset -3px -3px 0 #C4551A}
+.sec-t h2{font-size:22px}
+.skyp{background:var(--night);border:3px solid var(--ink);border-radius:12px;padding:12px;display:grid;gap:14px;align-items:center;color:#fff}
+@media (min-width:640px){.skyp{grid-template-columns:220px 1fr}}
+.skyp .const{width:200px;height:200px;margin:0 auto;display:block}
+.skyp h3{font-size:26px;color:var(--gold)}
+.skyp .bigdirs{font-size:13px;color:#C9D1F5;margin-top:8px}
+.also{display:grid;gap:10px;margin-top:10px}
+@media (min-width:640px){.also{grid-template-columns:1fr 1fr}}
+.also div{background:#fff;border:3px solid var(--ink);border-radius:10px;padding:10px 12px;font-weight:800}
+.also small{display:block;font-weight:600;color:var(--ink2)}
+.profs{display:grid;gap:10px}
+@media (min-width:640px){.profs{grid-template-columns:1fr 1fr}}
+.prof{background:#fff;border:3px solid var(--ink);border-radius:10px;padding:10px 12px}
+.prof b{display:block}
+.powers{display:grid;gap:12px}
+@media (min-width:640px){.powers{grid-template-columns:1fr 1fr}}
+.pw{background:#fff;border:3px solid var(--ink);border-radius:12px;padding:12px}
+.pw h3{font-size:17px;margin-bottom:8px}
+.pw.hard h3{color:var(--blue-d)}
+.pw.soft h3{color:var(--grass-d)}
+.bar{margin:8px 0}
+.bar .bl{display:flex;justify-content:space-between;font-weight:800;font-size:15px;gap:8px}
+.bar .bt{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:4px}
+.bar .bt i{height:16px;border:2px solid var(--ink);background:#EDEAE0}
+.pw.hard .bt i.on{background:var(--hard)}
+.pw.soft .bt i.on{background:var(--soft)}
+.bar.grow .bt i.on{background:var(--orange)}
+.tag{display:inline-block;font-size:12px;font-weight:800;background:var(--orange);color:#fff;border-radius:6px;padding:1px 7px;border:2px solid var(--ink)}
+.type{margin-top:12px;background:var(--gold);border:3px solid var(--ink);border-radius:12px;padding:12px;box-shadow:inset -5px -5px 0 var(--gold-d)}
+.type h3{font-size:20px}
+.quest{display:grid;gap:12px}
+@media (min-width:760px){.quest{grid-template-columns:1fr 1fr}}
+.quest h3{font-size:18px;margin-bottom:8px}
+.qlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.qlist li{background:#fff;border:3px solid var(--ink);border-radius:10px;padding:9px 12px 9px 46px;position:relative;font-weight:700}
+.qlist li:before{content:"";position:absolute;left:10px;top:10px;width:22px;height:22px;border:3px solid var(--ink);border-radius:4px;background:var(--paper2)}
+.qlist li em{display:block;font-style:normal;font-weight:600;font-size:13px;color:var(--ink2)}
+.qlist .qc{display:inline-block;font-size:12px;font-weight:800;border-radius:6px;padding:0 6px;margin-right:6px;border:2px solid var(--ink);background:var(--paper2)}
+.qc.hard{background:var(--hard);color:#fff}
+.qc.soft{background:var(--soft);color:#fff}
+.qc.olymp{background:var(--gold)}
+.home{margin-top:12px;background:#E8F6E3;border:3px solid var(--ink);border-radius:12px;padding:12px}
+.kv{background:#fff;border:3px solid var(--ink);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.kv .k{font-family:var(--f-head);font-size:13px;color:var(--orange);margin-bottom:4px}
+.kv small{display:block;color:var(--ink2);font-size:13px}
+.olist{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.olist li{background:#fff;border:3px solid var(--ink);border-radius:10px;padding:9px 12px;font-weight:700}
+.olist li small{display:block;font-weight:600;color:var(--ink2);font-size:13px}
+.olist li.dim{opacity:.6}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+.fb{display:grid;gap:14px}
+.fb .q{font-weight:800;margin-bottom:6px}
+.fb .o{display:flex;gap:8px;flex-wrap:wrap}
+.fb .o button{border:3px solid var(--ink);border-radius:10px;background:#fff;padding:8px 14px;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 3px 0 var(--ink)}
+.fb .o button.sel{background:var(--gold)}
+.toast{position:fixed;left:50%;bottom:78px;transform:translateX(-50%);z-index:50;max-width:min(560px,92vw);background:#fff;border:3px solid var(--ink);border-radius:12px;box-shadow:0 5px 0 var(--ink);padding:12px 40px 12px 14px;font-weight:700}
+.toast .x{position:absolute;right:8px;top:6px;border:0;background:none;font-size:20px;cursor:pointer}
+.flyblock{position:fixed;z-index:60;width:22px;height:22px;background:var(--gold);border:3px solid var(--ink);pointer-events:none}
+.qrbox{background:#fff;border:3px solid var(--ink);border-radius:10px;padding:10px;width:220px;height:220px;margin:10px auto}
+.qrbox.big{width:min(300px,78vw);height:min(300px,78vw)}
+.qrbox svg{width:100%;height:100%;display:block}
+.dadd{display:grid;gap:12px;margin-top:12px}
+@media (min-width:760px){.dadd{grid-template-columns:repeat(3,1fr)}}
+.dadd .kv textarea{width:100%;border:3px solid var(--ink);border-radius:8px;padding:8px;font-family:inherit;font-size:14px}
+.scanbox{display:none;margin-top:8px}.scanbox.on{display:block}
+.scanbox video{width:100%;max-width:340px;border:3px solid var(--ink);border-radius:8px;background:#000}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+@media (min-width:760px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kpis div{background:#fff;border:3px solid var(--ink);border-radius:10px;padding:10px}
+.kpis b{display:block;font-family:var(--f-head);font-size:28px;color:var(--orange)}
+.kpis span{font-size:13px;font-weight:700;color:var(--ink2)}
+.dgrid{display:grid;gap:12px;margin-top:12px}
+@media (min-width:760px){.dgrid{grid-template-columns:1fr 1fr}}
+.dgrid h3{font-size:17px;margin-bottom:8px}
+.dbar{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(60px,1fr) 70px;gap:8px;align-items:center;font-size:14px;font-weight:700;margin:6px 0}
+.dt{height:14px;border:2px solid var(--ink);background:#EDEAE0}
+.dt i{display:block;height:100%;background:var(--gold)}
+.dv{text-align:right;font-variant-numeric:tabular-nums}
+.dfilter{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px;font-weight:700}
+.dfilter select{border:3px solid var(--ink);border-radius:8px;padding:6px;font-family:inherit;font-weight:700;background:#fff}
+.dtable{overflow-x:auto}
+.dtable table{border-collapse:collapse;width:100%;font-size:14px}
+.dtable th,.dtable td{border-bottom:2px solid #E3DFCF;padding:6px 8px;text-align:left;white-space:nowrap}
+.foot{position:relative;z-index:1;text-align:center;font-size:13px;font-weight:700;color:var(--ink2);margin-top:16px}
+.back{margin-bottom:10px}
+@media (prefers-reduced-motion:reduce){.cloud,.fade{animation:none}}
+/* документ для PDF и печати */
+#printSheet{display:none}
+.pdf-holder{position:fixed;left:-12000px;top:0;width:718px;background:#fff;z-index:-1}
+.pdoc{font-family:'Nunito',Arial,sans-serif;color:#1B2440;background:#fff;padding:6px 10px;font-size:13px;line-height:1.45;max-width:718px}
+.pdoc h1{font-family:'Russo One',Arial,sans-serif;font-weight:400;font-size:21px;margin:4px 0}
+.pdoc h2{font-family:'Russo One',Arial,sans-serif;font-weight:400;font-size:15px;margin:14px 0 6px;color:#C4551A}
+.pdoc h3{font-size:13.5px;margin:8px 0 4px}
+.pdoc p{margin:4px 0}.pdoc ul,.pdoc ol{margin:4px 0;padding-left:20px}.pdoc li{margin:3px 0}
+.pdoc .ph{border:3px solid #1B2440;border-radius:10px;background:#FFF6D8;padding:8px 12px;display:flex;gap:12px;align-items:center}
+.pdoc .ph svg{width:70px;height:70px;flex:none}
+.pdoc .pbrand{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#C4551A}
+.pdoc .pmeta{color:#46506E}
+.pdoc .ptwo{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:14px;align-items:start}
+.pdoc .const{width:160px;height:160px;background:#1A2350;border-radius:10px}
+.pdoc .pnote{background:#F4F1E4;border-radius:8px;padding:8px 10px;font-size:11.5px;margin-top:10px}
+.pdoc .pfoot{margin-top:12px;font-size:10.5px;color:#666;border-top:1px solid #ddd;padding-top:6px}
+.pdoc .ptbl{border-collapse:collapse;width:100%}.pdoc .ptbl td{border-bottom:1px solid #ddd;padding:4px 6px}
+.pdoc.poster{text-align:center;padding-top:30px}
+.pdoc.poster h1{font-size:30px}
+.pdoc.poster .big{font-size:18px;max-width:560px;margin:14px auto}
+.pdoc.poster .pqr{width:330px;height:330px;margin:20px auto}.pdoc.poster .pqr svg{width:100%;height:100%}
+@media print{
+  body{background:#fff}
+  .world,.clouds,.ground{display:none!important}
+  #printSheet{display:block}
+  #printSheet .pdoc{max-width:180mm;margin:0 auto}
+  #printSheet .pbreak{page-break-before:always;break-before:page}
+}
+
+</style>
+</head>
+<body>
+<div class="clouds" aria-hidden="true"><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div></div>
+<div class="ground" aria-hidden="true"></div>
+<div class="world">
+  <header class="top"><div class="logo"><div class="cube" aria-hidden="true">★</div><div><b>Созвездие</b><small>Конструктор компетенций юного инженера</small></div></div><span class="pill">1–4 класс</span></header>
+  <div class="hud" id="hud" hidden></div>
+  <main id="view"></main>
+  <p class="foot">Проект ученика 4 класса ГБОУ «ИТШ № 777», Санкт-Петербург</p>
+</div>
+<div id="printSheet"></div>
+<script>
+/* qrcode-generator 1.4.4 — (c) Kazuhiko Arase, MIT License */
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1})},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(n*r,o*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}(function(){return qrcode});
+</script>
+<script>
+const DATA = {"meta":{"name":"Конструктор компетенций юного инженера «Созвездие»","short":"Созвездие","sub":"для 1–4 класса","product":"Индивидуальный план развития инженерных компетенций","author":{"name":"Абрин Владислав","grade":"4.3","supervisor":"Борисова Ольга Владимировна","mentor":"Абрин Евгений Олегович"},"collect":{"yandexDiskUrl":"https://disk.yandex.ru/d/0nyul6tN5n2X7A","dashboardFolder":"Результаты\\Dashboard"},"grades":[1,2,3,4],"schools":[{"key":"itsh","label":"ИТШ № 777","sub":"Санкт-Петербург"},{"key":"any","label":"Другая школа","sub":"напиши город"}],"bigGroups":{"mash":"Машиностроение","stroy":"Строительство","energy":"Энергетика","oil":"Нефтегазовая отрасль","transport":"Транспорт","it":"IT и цифровая инженерия","robo":"Робототехника и автоматизация","mecha":"Мехатроника","ai":"Искусственный интеллект и машинное обучение в инженерии","bio":"Биоинженерия и медицинская (биомедицинская) инженерия","space":"Космическая инженерия","mat":"Материаловедение и нанотехнологии","safety":"Промышленная безопасность","eco":"Экологическая инженерия"}},"olympiads":{"ikar":{"name":"ИКаР-СТАРТ — соревнования команд по 2–3 человека (роботы и конструирование)","g":[1,4],"when":"сезон — на сайте организатора","url":"https://www.xn--80a2aec.xn--p1ai/inzhenernye-kadry-rossii/ikar/ikar-start","lvl":"fed","id":"ikar"},"rro":{"name":"Российская робототехническая олимпиада — начальная (7–9 лет) и младшая (9–12 лет) категории","g":[1,4],"when":"отборы в течение учебного года","url":"https://rrosport.ru/","lvl":"fed","id":"rro"},"pilots":{"name":"Чемпионат «Пилоты будущего» — управление дронами (с 7 лет)","g":[1,4],"when":"сезон — весна–осень","url":"https://fgdr.ru/tpost/xfdxxg1ih1-vserossiiskii-chempionat-pilotirovaniya","lvl":"fed","id":"pilots"},"shustrik":{"name":"Конкурс изобретений «ШУСТРИК» (группы 6–9 и 10–13 лет)","g":[1,4],"when":"задания — осенью, работы — с декабря по апрель","url":"https://shustrik.org/regulations","lvl":"fed","id":"shustrik"},"scout":{"name":"Всероссийские соревнования по подводной робототехнике, класс Scout","g":[1,4],"when":"сроки — на сайте организатора","url":"https://marine.robocenter.org/competitions/vserossijskie-sorevnovaniya-po-podvodnoj-robototehnike/obshaya-informaciya/","lvl":"fed","id":"scout"},"vmeste":{"name":"Конкурс «#ВместеЯрче» — рисунок или плакат про энергию","g":[1,4],"when":"региональный этап — с мая по октябрь","url":"https://konkurs.mpei.ru/rules","lvl":"fed","id":"vmeste"},"uchi_inf":{"name":"Олимпиада Учи.ру по информатике (бесплатно)","g":[1,4],"when":"туры — в конце лета и в ноябре","url":"https://olympiads.uchi.ru/","lvl":"fed","id":"uchi_inf"},"uchi_mat":{"name":"Олимпиада Учи.ру по математике (бесплатно)","g":[1,4],"when":"сроки — на сайте","url":"https://olympiads.uchi.ru/","lvl":"fed","id":"uchi_mat"},"uchi_env":{"name":"Олимпиада Учи.ру «Окружающий мир и экология» (бесплатно)","g":[1,4],"when":"туры — в феврале–марте и апреле","url":"https://olympiads.uchi.ru/","lvl":"fed","id":"uchi_env"},"vsosh4":{"name":"Всероссийская олимпиада школьников по математике — школьный этап (с 4 класса)","g":[4,4],"when":"осенью в своей школе","url":"https://vos.olimpiada.ru/","lvl":"fed","id":"vsosh4"},"issled":{"name":"Конкурс исследовательских работ «Я — исследователь!» для младших школьников","g":[1,4],"when":"региональный отбор — февраль–апрель","url":"https://issledovatel.pro/konkursy/ya-issledovatel/","lvl":"fed","id":"issled"},"intellekt":{"name":"Конкурс «Интеллект будущего» (ИТШ № 777), направление «Мои первые открытия» для 1–4 классов","g":[1,4],"when":"сроки — в Положении конкурса","url":"https://school777.spb.ru","lvl":"spb","id":"intellekt"}},"next":{"ntoj":{"name":"НТО Юниоры — командные задачи для 5–7 классов","g":[5,7],"url":"https://ntcontest.ru"},"vsosh":{"name":"Всероссийская олимпиада школьников — с 5 класса по многим предметам","g":[5,11],"url":"https://vos.olimpiada.ru/"}},"tracks":[{"id":1,"key":"robo","emoji":"🤖","name":"Роботы и умные машины","big":["robo","mecha"],"what":"Собирают роботов и учат их двигаться: ездить, хватать, помогать людям на заводе и дома.","profs":["Инженер-робототехник — собирает и программирует роботов","Инженер-мехатроник — соединяет моторы, датчики и программы"],"itsh":"«Школа юного инженера» и кружки робототехники в «Лахта-полисе»","any":{"12":"Кружок робототехники на конструкторе — в школе, Доме творчества или центре технического творчества (возраст уточни)","34":"Кружок робототехники — в школе, Доме творчества, центре технического творчества или IT-кубе (возраст уточни в своём центре)"},"spb":"В Петербурге: Аничков дворец (Лаборатория робототехники, с 7 лет), Академия технического творчества и цифровых технологий (с 7 лет)","home":"Собери машинку из картона и резинки — пусть проедет сама хотя бы метр","project":"Собери из конструктора робота или машинку с мотором и научи её проезжать по линии","unis":["ИТМО","СПбПУ (Политех)","ЛЭТИ","БГТУ «Военмех»"],"fed":["МГТУ им. Н. Э. Баумана","ТПУ","УрФУ","МИЭТ"],"spo":[{"name":"Факультет СПО ГУАП","spec":"15.02.10 Мехатроника и робототехника"},{"name":"Колледж автоматизации производственных процессов и прикладных информационных систем","spec":"27.02.04 Автоматические системы управления"},{"name":"Колледж электроники и информационных технологий им. В. К. Широкова","spec":"15.02.10 Мехатроника и робототехника"}],"constellation":{"points":[[30,20],[70,20],[70,55],[30,55],[20,85],[80,85]],"lines":[[0,1],[1,2],[2,3],[3,0],[3,4],[2,5]]},"olympiads":["ikar","rro","scout","shustrik"]},{"id":2,"key":"it","emoji":"💻","name":"Программы и умные компьютеры","big":["it","ai"],"what":"Пишут программы и игры, учат компьютер узнавать картинки и помогать людям.","profs":["Программист — пишет программы и игры","Инженер искусственного интеллекта — учит компьютер «думать»"],"itsh":"Курсы программирования в «Лахта-полисе» и кабинет VR/AR","any":{"12":"ScratchJr на планшете дома или кружок информатики в школе","34":"Scratch дома или кружок программирования в школе, Доме творчества или IT-кубе (возраст уточни)"},"spb":"В Петербурге: Аничков дворец (Центр компьютерных технологий, с 7 лет), Академия технического творчества и цифровых технологий (с 7 лет)","home":"Сделай свою первую игру в ScratchJr или Scratch — хватит 20 минут","project":"Сделай в Scratch свою игру с двумя уровнями и дай поиграть друзьям","unis":["ИТМО","СПбПУ (Политех)","СПбГУ","ЛЭТИ"],"fed":["МФТИ","НИУ ВШЭ","МГТУ им. Н. Э. Баумана","МГУ им. М. В. Ломоносова"],"spo":[{"name":"Колледж информационных технологий","spec":"09.02.07 Информационные системы и программирование"},{"name":"Колледж телекоммуникаций им. Э. Т. Кренкеля (СПбГУТ)","spec":"11.02.15 Инфокоммуникационные сети и системы связи"},{"name":"Петровский колледж","spec":"Интеграция решений с применением технологий искусственного интеллекта"}],"constellation":{"points":[[35,20],[10,50],[35,80],[65,20],[90,50],[65,80]],"lines":[[0,1],[1,2],[3,4],[4,5]]},"olympiads":["uchi_inf","uchi_mat","vsosh4","shustrik"]},{"id":3,"key":"space","emoji":"🚀","name":"Космос и ракеты","big":["space"],"what":"Строят ракеты и спутники, запускают их в космос и смотрят на Землю сверху.","profs":["Инженер-конструктор ракет — придумывает ракеты","Инженер спутников — делает спутники, которые летают вокруг Земли"],"itsh":"Центр «Космические технологии» ИТШ и курс «Лаборатория Архимеда»","any":{"12":"Поход в планетарий и кружок моделирования в Доме творчества (возраст уточни)","34":"Кружок ракетного или авиамоделирования в Доме творчества или центре технического творчества (возраст уточни)"},"spb":"В Петербурге: Аничков дворец (Стендовый моделизм, с 7 лет)","home":"Запусти бумажную ракету от трубочки и измерь, как далеко она улетела","project":"Сделай модель ракеты из бумаги и картона и проверь, как далеко она летит","unis":["БГТУ «Военмех»","ГУАП","СПбПУ (Политех)"],"fed":["МАИ","МГТУ им. Н. Э. Баумана","Самарский университет им. С. П. Королёва"],"spo":[{"name":"Факультет СПО ГУАП","spec":"12.02.01 Авиационные приборы и комплексы"},{"name":"Колледж электроники и информационных технологий им. В. К. Широкова","spec":"25.02.08 Эксплуатация беспилотных авиационных систем"}],"constellation":{"points":[[50,5],[65,35],[60,75],[40,75],[35,35],[50,95]],"lines":[[0,1],[1,2],[2,3],[3,4],[4,0],[2,5],[3,5]]},"olympiads":["shustrik","uchi_env","issled"]},{"id":4,"key":"trans","emoji":"✈️","name":"Самолёты, поезда и корабли","big":["transport"],"what":"Придумывают и чинят самолёты, поезда, машины, корабли и дроны.","profs":["Инженер-кораблестроитель — строит корабли","Инженер беспилотников — учит дроны летать"],"itsh":"Лаборатория БПЛА ИТШ и кружки моделирования в «Лахта-полисе»; Кружок судомоделизма и лаборатория подводной робототехники ИТШ","any":{"12":"Бумажные самолётики и кораблики дома, кружок моделирования в Доме творчества (возраст уточни)","34":"Кружок авиа-, судо- или автомоделирования в Доме творчества или центре технического творчества (возраст уточни)"},"spb":"В Петербурге: Аничков дворец (Судомакетирование и Автомодельная лаборатория, с 7 лет)","home":"Сделай два бумажных планера с разными крыльями и проверь, какой летит дальше","project":"Сделай кораблик из фольги и проверь, сколько монеток он выдержит на воде","unis":["ПГУПС","ГУАП","СПбГМТУ (Корабелка)","ГУМРФ им. адмирала С. О. Макарова"],"fed":["РУТ (МИИТ)","МАИ","МАДИ"],"spo":[{"name":"Санкт-Петербургский техникум железнодорожного транспорта (ПГУПС)","spec":"23.02.06 Техническая эксплуатация подвижного состава железных дорог"},{"name":"Колледж ГУМРФ им. адмирала С. О. Макарова","spec":"26.02.03 Судовождение"},{"name":"Авиационно-транспортный колледж СПбГУ ГА","spec":"25.02.05 Управление движением воздушного транспорта"}],"constellation":{"points":[[20,30],[80,30],[20,70],[80,70],[50,50],[50,35]],"lines":[[4,0],[4,1],[4,2],[4,3],[4,5]]},"olympiads":["pilots","scout","shustrik"]},{"id":5,"key":"stroy","emoji":"🏗️","name":"Дома, мосты и города","big":["stroy"],"what":"Строят дома, мосты и дороги и делают города удобными для людей.","profs":["Инженер-строитель — рассчитывает, чтобы дом стоял крепко","Проектировщик — рисует проект здания на компьютере"],"itsh":"Архитектурные интенсивы ИТШ и проект «Инженерная книга»","any":{"12":"Кружок конструирования или макетирования в Доме творчества (возраст уточни)","34":"Кружок архитектуры и макетирования в Доме творчества (возраст уточни)"},"spb":"В Петербурге: Аничков дворец (Начальное техническое творчество, 1–2 класс)","home":"Построй башню из бумаги выше своей руки, чтобы она не упала","project":"Построй из картона макет двора своей мечты и расскажи, что где находится","unis":["СПбГАСУ","СПбПУ (Политех)","ПГУПС"],"fed":["НИУ МГСУ","УрФУ","ДВФУ"],"spo":[{"name":"Санкт-Петербургский архитектурно-строительный колледж","spec":"08.02.01 Строительство и эксплуатация зданий и сооружений"},{"name":"Колледж автоматизации производственных процессов и прикладных информационных систем","spec":"08.02.15 Информационное моделирование в строительстве"},{"name":"Колледж водных ресурсов","spec":"08.02.04 Водоснабжение и водоотведение"}],"constellation":{"points":[[10,90],[10,50],[30,50],[30,30],[50,30],[50,60],[70,60],[70,20],[90,20],[90,90]],"lines":[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9]]},"olympiads":["shustrik","uchi_mat","vsosh4","issled"]},{"id":6,"key":"energy","emoji":"⚡","name":"Энергия и электричество","big":["energy","oil"],"what":"Делают так, чтобы в домах был свет и тепло: строят электростанции, провода и добывают топливо.","profs":["Инженер-энергетик — отвечает за свет и тепло в городе","Инженер по солнечной и ветровой энергии"],"itsh":"Курс «Лаборатория Архимеда» и опыты по физике в ИТШ","any":{"12":"Простые опыты с батарейкой и лампочкой — вместе со взрослым; кружок опытов в школе","34":"Кружок опытов и техники в школе или Доме творчества (возраст уточни)"},"spb":"В Петербурге: Академия технического творчества и цифровых технологий (с 7 лет)","home":"Собери цепь из батарейки и лампочки и проверь, что проводит ток: монетка, ластик, гвоздь","project":"Вместе со взрослым собери фонарик с батарейкой и выключателем","unis":["СПбПУ (Политех)","ЛЭТИ","Горный университет","СПбГТИ(ТУ) (Технологический институт)"],"fed":["НИУ «МЭИ»","УрФУ","ТПУ","РГУ нефти и газа им. И. М. Губкина"],"spo":[{"name":"Политехнический колледж городского хозяйства","spec":"13.02.01 Тепловые электрические станции"},{"name":"Институт среднего профессионального образования СПбПУ","spec":"13.02.12 Электрические станции, сети, их релейная защита и автоматизация"},{"name":"Колледж метрополитена","spec":"13.02.07 Электроснабжение"}],"constellation":{"points":[[60,5],[30,50],[55,50],[40,95],[75,45],[50,45]],"lines":[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0]]},"olympiads":["vmeste","shustrik","uchi_env"]},{"id":7,"key":"mash","emoji":"⚙️","name":"Механизмы и новые материалы","big":["mash","mat"],"what":"Придумывают механизмы и машины и создают новые материалы — прочнее, легче и умнее старых.","profs":["Инженер-конструктор — придумывает детали и механизмы","Инженер-материаловед — создаёт новые материалы"],"itsh":"Мастерские ИТШ и проект «Инженерная книга»","any":{"12":"Кружок конструирования в школе или Доме творчества (возраст уточни)","34":"Кружок технического моделирования или 3D-моделирования в Доме творчества (возраст уточни)"},"spb":"В Петербурге: Аничков дворец (Начальное техническое творчество, 1–2 класс; Стендовый моделизм, с 7 лет)","home":"Построй мост из спагетти и проверь, выдержит ли он книгу","project":"Собери из конструктора механизм с шестерёнками, который что-то поднимает","unis":["СПбПУ (Политех)","БГТУ «Военмех»","ИТМО","СПбГТИ(ТУ) (Технологический институт)"],"fed":["МГТУ им. Н. Э. Баумана","УрФУ","ТПУ","НИТУ МИСИС"],"spo":[{"name":"Академия машиностроения им. Ж. Я. Котина","spec":"15.02.16 Технология машиностроения"},{"name":"Факультет СПО ГУАП","spec":"15.02.16 Технология машиностроения"},{"name":"Центр СПО Санкт-Петербургского государственного технологического института (СПбГТИ(ТУ))","spec":"Технология аналитического контроля химических соединений"}],"constellation":{"points":[[50,10],[85,30],[85,70],[50,90],[15,70],[15,30],[50,50]],"lines":[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[6,0],[6,2],[6,4]]},"olympiads":["shustrik","ikar","uchi_mat"]},{"id":8,"key":"nature","emoji":"🌿","name":"Природа, здоровье и безопасность","big":["bio","eco","safety"],"what":"Делают приборы для врачей, берегут природу с помощью техники и следят, чтобы людям было безопасно.","profs":["Биоинженер — делает приборы для здоровья","Инженер-эколог — очищает воду и воздух","Инженер по безопасности — следит, чтобы никто не пострадал"],"itsh":"Лаборатория нейротехнологий ИТШ и курс «Инженером стану я»","any":{"12":"Кружок юного натуралиста или опыты с растениями дома","34":"Экологический или естественнонаучный кружок в школе или Доме творчества (возраст уточни)"},"spb":"В Петербурге: Академия технического творчества и цифровых технологий, химико-биологический кластер (с 7 лет)","home":"Прорасти семена в двух стаканах — на свету и в темноте — и сравни через неделю","project":"Проведи исследование: как растут растения при разном свете — и оформи его для конкурса","unis":["ИТМО","ЛЭТИ","СПбПУ (Политех)","СПбГТИ(ТУ) (Технологический институт)"],"fed":["МГУ им. М. В. Ломоносова","МФТИ","Сеченовский университет","ТПУ"],"spo":[{"name":"Политехнический колледж городского хозяйства","spec":"12.02.10 Монтаж, техническое обслуживание и ремонт биотехнических и медицинских аппаратов и систем"},{"name":"Центр СПО Санкт-Петербургского государственного технологического института (СПбГТИ(ТУ))","spec":"Биохимическое производство"},{"name":"Петровский колледж","spec":"20.02.01 Экологическая безопасность природных комплексов"}],"constellation":{"points":[[30,10],[70,25],[30,45],[70,60],[30,80],[70,95]],"lines":[[0,1],[1,2],[2,3],[3,4],[4,5]]},"olympiads":["issled","uchi_env","shustrik"]}],"questions":[{"text":"Что ты выберешь в выходной?","options":[{"emoji":"🤖","text":"Собрать робота из конструктора","p":1,"s":3},{"emoji":"🎮","text":"Придумать свою компьютерную игру","p":2,"s":3},{"emoji":"🔭","text":"Смотреть на звёзды в телескоп","p":3,"s":8},{"emoji":"🌱","text":"Посадить растение и следить, как оно растёт","p":8,"s":6}]},{"text":"На какую экскурсию ты хочешь?","options":[{"emoji":"🚀","text":"В музей космонавтики","p":3,"s":6},{"emoji":"🚂","text":"В депо к настоящим поездам","p":4,"s":5},{"emoji":"⚡","text":"На электростанцию","p":6,"s":5},{"emoji":"🏗️","text":"На стройку высокого дома","p":5,"s":7}]},{"text":"Какой подарок самый крутой?","options":[{"emoji":"🧲","text":"Набор юного физика: магниты и лампочки","p":6,"s":1},{"emoji":"🧱","text":"Конструктор с шестерёнками","p":7,"s":1},{"emoji":"💻","text":"Программа, чтобы научиться программировать","p":2,"s":1},{"emoji":"🔬","text":"Микроскоп","p":8,"s":7}]},{"text":"Что интереснее всего понять?","options":[{"emoji":"🚁","text":"Как летает вертолёт","p":4,"s":6},{"emoji":"💡","text":"Почему горит лампочка","p":6,"s":2},{"emoji":"🌉","text":"Как строят мосты","p":5,"s":4},{"emoji":"🦾","text":"Как двигается робот","p":1,"s":2}]},{"text":"Кем ты будешь в команде?","options":[{"emoji":"📐","text":"Нарисую чертёж","p":7,"s":5},{"emoji":"🧑‍💻","text":"Напишу программу","p":2,"s":1},{"emoji":"🛰️","text":"Придумаю, как модель полетит в небо","p":3,"s":4},{"emoji":"🌍","text":"Проверю, не вредим ли мы природе","p":8,"s":5}]},{"text":"Что бы ты изобрёл?","options":[{"emoji":"🤖","text":"Робота-помощника по дому","p":1,"s":8},{"emoji":"🌳","text":"Машину, которая сажает деревья","p":8,"s":7},{"emoji":"🏙️","text":"Город, где всё работает само","p":5,"s":2},{"emoji":"🚀","text":"Ракету на Луну","p":3,"s":6}]},{"text":"Какой мультфильм выберешь?","options":[{"emoji":"🦿","text":"Про роботов и изобретателей","p":1,"s":2},{"emoji":"🚢","text":"Про большие корабли","p":4,"s":5},{"emoji":"⚙️","text":"Про то, как работают машины","p":7,"s":6},{"emoji":"🐞","text":"Про животных и растения","p":8,"s":3}]},{"text":"Что ты сделаешь из коробок и клея?","options":[{"emoji":"🏠","text":"Дом с окнами и крышей","p":5,"s":8},{"emoji":"🚗","text":"Машинку с крутящимися колёсами","p":7,"s":4},{"emoji":"🛸","text":"Космический корабль","p":3,"s":4},{"emoji":"🔦","text":"Фонарик с кнопкой","p":6,"s":7}]},{"text":"Что хочется узнать?","options":[{"emoji":"🧠","text":"Как компьютер узнаёт, что нарисовано на картинке","p":2,"s":1},{"emoji":"🔋","text":"Откуда в розетке электричество","p":6,"s":8},{"emoji":"✈️","text":"Почему самолёт не падает","p":4,"s":3},{"emoji":"🏢","text":"Почему небоскрёб не падает от ветра","p":5,"s":6}]},{"text":"Где ты хотел бы работать, когда вырастешь?","options":[{"emoji":"🏭","text":"На заводе, где делают роботов","p":1,"s":7},{"emoji":"🖥️","text":"Там, где пишут программы и игры","p":2,"s":3},{"emoji":"⚓","text":"На корабле или в аэропорту","p":4,"s":5},{"emoji":"🛠️","text":"В мастерской, где придумывают новые механизмы","p":7,"s":8}]}],"finalPick":{"text":"Какой проект ты взял бы на лето? Выбери два","pickCount":2,"bonus":3,"options":[{"track":1,"text":"Собрать робота, который ездит сам"},{"track":2,"text":"Придумать свою игру на компьютере"},{"track":3,"text":"Сделать модель ракеты и запустить её"},{"track":4,"text":"Построить модель самолёта или корабля"},{"track":5,"text":"Построить макет города будущего"},{"track":6,"text":"Собрать фонарик или вертушку-ветряк"},{"track":7,"text":"Собрать механизм с шестерёнками"},{"track":8,"text":"Устроить мини-лабораторию и изучать природу"}]},"statements":[{"id":1,"block":"T","text":"Мне нравится мастерить руками"},{"id":2,"block":"D","text":"Я люблю придумывать что-то на компьютере или планшете"},{"id":3,"block":"M","text":"Если не получается, я пробую по-другому"},{"id":4,"block":"K","text":"Мне нравится делать проекты вместе с друзьями"},{"id":5,"block":"T","text":"Я люблю разбирать вещи, чтобы понять, как они устроены"},{"id":6,"block":"D","text":"Мне нравится решать задачки с числами"},{"id":7,"block":"M","text":"Я довожу начатое дело до конца"},{"id":8,"block":"K","text":"Я люблю рассказывать другим, что я придумал"}],"scale":[{"value":1,"label":"Не про меня","emoji":"😕"},{"value":3,"label":"Иногда","emoji":"🙂"},{"value":5,"label":"Да, это я!","emoji":"🤩"}],"skillBlocks":[{"key":"T","name":"Умелые руки","kind":"hard","desc":"мастерить, собирать, чинить"},{"key":"D","name":"Цифровые умения","kind":"hard","desc":"компьютер, программы, числа"},{"key":"M","name":"Смекалка","kind":"soft","desc":"придумывать, пробовать, доводить до конца"},{"key":"K","name":"Дружба и команда","kind":"soft","desc":"работать вместе, рассказывать о своём"}],"steps":{"T":["Каждую неделю собирай что-нибудь новое по картинке или видео: машинку, мостик, домик","Попроси взрослых показать, как пользоваться отвёрткой и молотком, и почините что-нибудь вместе"],"D":["Пройди пять уроков Scratch или ScratchJr — по одному в неделю","Реши онлайн-олимпиаду по математике или информатике для своего класса"],"M":["Заведи тетрадь изобретателя: записывай и рисуй свои идеи","Играй в головоломки и логические игры: шашки, шахматы, судоку для детей"],"K":["Сделай с другом общий проект и расскажите о нём в классе","Расскажи родителям о своей поделке за 2 минуты — как настоящий инженер на защите проекта"]},"types":{"constructor":{"name":"Мастер","emoji":"🔧","desc":"Тебе нравится делать вещи руками."},"researcher":{"name":"Исследователь","emoji":"🔭","desc":"Тебе интересно, как всё устроено."},"architect":{"name":"Придумщик","emoji":"🧭","desc":"Ты любишь придумывать и планировать."},"captain":{"name":"Командир","emoji":"🧑‍🚀","desc":"У тебя получается объяснять и вести за собой."},"universal":{"name":"Всё понемногу","emoji":"🌟","desc":"У тебя получается всего по чуть-чуть."},"starter":{"name":"Начинающий","emoji":"🌱","desc":"Ты только начинаешь пробовать — это здорово."}},"typeRules":{"starterMax":2.5,"universalSpread":0.5,"universalMin":3,"pairMap":{"T+D":"researcher","T+M":"constructor","T+K":"constructor","D+M":"architect","D+K":"captain","M+K":"captain"}},"feedback":[{"id":"process","text":"Тебе понравилось проходить тестирование?","options":["Да","Немножко","Нет"]},{"id":"plan","text":"Тебе понравился твой план развития?","options":["Да","Немножко","Нет"]},{"id":"orient","text":"Теперь ты лучше понимаешь, каким инженером можно стать?","options":["Да","Немножко","Нет"]}],"before":{"text":"Ты уже знаешь, кем хочешь стать?","options":["Да, знаю","Ещё думаю","Пока нет"]},"parent":{"title":"Для родителей","lead":"Это «Индивидуальный план развития инженерных компетенций», который ваш ребёнок получил после тестирования. Коротко о том, что это такое.","points":["Это не диагностика способностей и не выбор профессии. В 7–10 лет интересы часто меняются — это нормально: по Д. Сьюперу это стадия фантазии и интересов.","План показывает, что ребёнку интересно сейчас, какие умения уже получаются и что можно попробовать: кружок, конкурс, дело дома.","Лучшее, что можно сделать дальше, — дать попробовать руками и поговорить о том, как устроена ваша работа.","Пройдите тестирование ещё раз через полгода и сравните результаты.","Сервис не собирает персональные данные: имя остаётся только в плане на этом устройстве."]},"heroes":[{"key":"r","name":"Красный","body":"E8453C","dark":"A92E27"},{"key":"o","name":"Оранжевый","body":"FF8A2B","dark":"C45F12"},{"key":"y","name":"Жёлтый","body":"FFC83D","dark":"C8931A"},{"key":"g","name":"Зелёный","body":"49B55A","dark":"2F7E3D"},{"key":"b","name":"Синий","body":"3A8DDE","dark":"2463A3"},{"key":"v","name":"Фиолетовый","body":"8B5CF6","dark":"6039C0"}],"cities":[{"name":"Москва","aliases":["москва","мск","г москва"],"unis":["МГТУ им. Н. Э. Баумана","НИЯУ МИФИ","МАИ","НИТУ МИСИС","РГУ нефти и газа им. И. М. Губкина","НИУ «МЭИ»","НИУ МГСУ","РУТ (МИИТ)","МИЭТ","МГУ им. М. В. Ломоносова"]},{"name":"Новосибирск","aliases":["новосибирск"],"unis":["НГТУ","НГУ"]},{"name":"Екатеринбург","aliases":["екатеринбург"],"unis":["УрФУ"]},{"name":"Казань","aliases":["казань"],"unis":["КНИТУ-КАИ","КНИТУ (КХТИ)","КФУ"]},{"name":"Нижний Новгород","aliases":["нижний новгород","н новгород"],"unis":["НГТУ им. Р. Е. Алексеева","ННГУ им. Н. И. Лобачевского"]},{"name":"Самара","aliases":["самара"],"unis":["Самарский университет им. С. П. Королёва","СамГТУ"]},{"name":"Томск","aliases":["томск"],"unis":["ТПУ","ТУСУР","ТГУ"]},{"name":"Пермь","aliases":["пермь"],"unis":["ПНИПУ"]},{"name":"Уфа","aliases":["уфа"],"unis":["УГНТУ","УУНиТ"]},{"name":"Челябинск","aliases":["челябинск"],"unis":["ЮУрГУ"]},{"name":"Омск","aliases":["омск"],"unis":["ОмГТУ"]},{"name":"Красноярск","aliases":["красноярск"],"unis":["СФУ"]},{"name":"Воронеж","aliases":["воронеж"],"unis":["ВГТУ"]},{"name":"Ростов-на-Дону","aliases":["ростов-на-дону","ростов на дону","ростов"],"unis":["ДГТУ","ЮФУ"]},{"name":"Волгоград","aliases":["волгоград"],"unis":["ВолгГТУ"]},{"name":"Саратов","aliases":["саратов"],"unis":["СГТУ им. Ю. А. Гагарина"]},{"name":"Краснодар","aliases":["краснодар"],"unis":["КубГТУ"]},{"name":"Тюмень","aliases":["тюмень"],"unis":["Тюменский индустриальный университет"]},{"name":"Иркутск","aliases":["иркутск"],"unis":["ИРНИТУ"]},{"name":"Владивосток","aliases":["владивосток"],"unis":["ДВФУ"]},{"name":"Хабаровск","aliases":["хабаровск"],"unis":["ТОГУ"]},{"name":"Калининград","aliases":["калининград"],"unis":["БФУ им. И. Канта","КГТУ"]},{"name":"Ижевск","aliases":["ижевск"],"unis":["ИжГТУ им. М. Т. Калашникова"]},{"name":"Белгород","aliases":["белгород"],"unis":["БГТУ им. В. Г. Шухова"]},{"name":"Тула","aliases":["тула"],"unis":["ТулГУ"]},{"name":"Ярославль","aliases":["ярославль"],"unis":["ЯГТУ"]},{"name":"Иваново","aliases":["иваново"],"unis":["ИГЭУ"]},{"name":"Архангельск","aliases":["архангельск"],"unis":["САФУ"]},{"name":"Севастополь","aliases":["севастополь"],"unis":["СевГУ"]},{"name":"Барнаул","aliases":["барнаул"],"unis":["АлтГТУ им. И. И. Ползунова"]},{"name":"Кемерово","aliases":["кемерово"],"unis":["КузГТУ"]},{"name":"Ульяновск","aliases":["ульяновск"],"unis":["УлГТУ"]},{"name":"Липецк","aliases":["липецк"],"unis":["ЛГТУ"]},{"name":"Тверь","aliases":["тверь"],"unis":["ТвГТУ"]},{"name":"Рязань","aliases":["рязань"],"unis":["РГРТУ"]},{"name":"Ставрополь","aliases":["ставрополь"],"unis":["СКФУ"]},{"name":"Якутск","aliases":["якутск"],"unis":["СВФУ"]},{"name":"Магнитогорск","aliases":["магнитогорск"],"unis":["МГТУ им. Г. И. Носова"]},{"name":"Великий Новгород","aliases":["великий новгород","новгород"],"unis":["НовГУ"]},{"name":"Петрозаводск","aliases":["петрозаводск"],"unis":["ПетрГУ"]},{"name":"Псков","aliases":["псков"],"unis":["ПсковГУ"]}],"spbAliases":["санкт-петербург","санкт петербург","спб","петербург","питер","с-петербург","с-пб","ленинград"],"profi":{"name":"Федеральный проект «Профессионалитет»","url":"https://япроф.рф/","text":"колледжи-участники есть во всех регионах; их программы делают вместе с предприятиями"}};
+/* =====================================================================
+   «Созвездие» для 1–4 класса — Конструктор компетенций юного инженера
+   Один файл: HTML + CSS + JavaScript, без сервера и без сборки.
+   ===================================================================== */
+const PREVIEW = !!window.SOZV_PREVIEW;
+const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const TR = Object.fromEntries(DATA.tracks.map(t=>[t.id,t]));
+const BL = ['T','D','M','K'], HARD=['T','D'], SOFT=['M','K'];
+const BLOCK = Object.fromEntries(DATA.skillBlocks.map(b=>[b.key,b]));
+const HERO = Object.fromEntries(DATA.heroes.map(h=>[h.key,h]));
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function previewOnly(what){ if(!PREVIEW) return false; toast(what+' работает на сайте на GitHub Pages. Здесь — предварительный просмотр.'); return true; }
+
+/* ---------- герой из кубиков (своя простая фигурка) ---------- */
+function heroSVG(key,mood){
+  const h=HERO[key]||HERO.o, c='#'+h.body, d='#'+h.dark;
+  const eyes=mood==='happy'?'<rect x="27" y="30" width="6" height="4" fill="#1B2440"/><rect x="47" y="30" width="6" height="4" fill="#1B2440"/><rect x="32" y="40" width="16" height="4" fill="#1B2440"/><rect x="30" y="38" width="4" height="4" fill="#1B2440"/><rect x="46" y="38" width="4" height="4" fill="#1B2440"/>'
+    :'<rect x="27" y="28" width="6" height="6" fill="#1B2440"/><rect x="47" y="28" width="6" height="6" fill="#1B2440"/><rect x="33" y="41" width="14" height="4" fill="#1B2440"/>';
+  return '<svg viewBox="0 0 80 110" role="img" aria-label="Герой-инженер">'+
+    '<rect x="16" y="8" width="48" height="10" fill="'+c+'" stroke="#1B2440" stroke-width="3"/><rect x="10" y="16" width="60" height="6" fill="'+d+'" stroke="#1B2440" stroke-width="3"/>'+
+    '<rect x="18" y="20" width="44" height="34" fill="#F6C9A0" stroke="#1B2440" stroke-width="3"/>'+eyes+
+    '<rect x="14" y="56" width="52" height="30" fill="'+c+'" stroke="#1B2440" stroke-width="3"/><rect x="34" y="60" width="12" height="8" fill="#FFC83D" stroke="#1B2440" stroke-width="2"/>'+
+    '<rect x="4" y="58" width="10" height="24" fill="'+d+'" stroke="#1B2440" stroke-width="3"/><rect x="66" y="58" width="10" height="24" fill="'+d+'" stroke="#1B2440" stroke-width="3"/>'+
+    '<rect x="18" y="86" width="18" height="20" fill="#46506E" stroke="#1B2440" stroke-width="3"/><rect x="44" y="86" width="18" height="20" fill="#46506E" stroke="#1B2440" stroke-width="3"/></svg>';
+}
+function constSVG(track,light){
+  const c=track.constellation, pts=c.points.map(p=>[10+p[0]*0.8,10+p[1]*0.8]);
+  const bg=light?'':'<rect width="100" height="100" fill="#1A2350"/>';
+  let stars=''; for(let i=0;i<14;i++){ const x=(i*37)%95+2, y=(i*53)%95+2; stars+='<rect x="'+x+'" y="'+y+'" width="1.6" height="1.6" fill="#8FA0E0"/>'; }
+  return '<svg class="const" viewBox="0 0 100 100" role="img" aria-label="Созвездие «'+esc(track.name)+'»">'+bg+stars+
+    c.lines.map(l=>'<line x1="'+pts[l[0]][0]+'" y1="'+pts[l[0]][1]+'" x2="'+pts[l[1]][0]+'" y2="'+pts[l[1]][1]+'" stroke="#FFC83D" stroke-width="1.6"/>').join('')+
+    pts.map(p=>'<rect x="'+(p[0]-3.5)+'" y="'+(p[1]-3.5)+'" width="7" height="7" fill="#FFE27A" stroke="#1B2440" stroke-width="1.2"/>').join('')+'</svg>';
+}
+
+/* ---------- город ---------- */
+function normCity(s){ return String(s||'').toLowerCase().replace(/ё/g,'е').replace(/^\s*(г\.|город|гор\.)\s*/,'').replace(/[«»"']/g,'').replace(/\s+/g,' ').trim(); }
+function cityInfo(school,raw){
+  if(school==='itsh') return {spb:true,name:'Санкт-Петербург'};
+  const n=normCity(raw); if(!n) return {spb:false,name:'',known:null};
+  if(DATA.spbAliases.includes(n)) return {spb:true,name:'Санкт-Петербург'};
+  const c=DATA.cities.find(c=>c.aliases.includes(n)||normCity(c.name)===n);
+  return {spb:false,name:c?c.name:String(raw).trim(),known:c||null};
+}
+
+/* ---------- подсчёт ---------- */
+const Q=DATA.questions, F=DATA.finalPick, ST=DATA.statements;
+const TOTAL = Q.length+1+ST.length;
+const wt=(o,t)=>o.p===t?2:(o.s===t?1:0);
+const MAXP=Object.fromEntries(DATA.tracks.map(t=>[t.id,Q.reduce((m,q)=>m+Math.max(...q.options.map(o=>wt(o,t.id))),0)+F.bonus]));
+function rank(answers,picks){
+  const s=Object.fromEntries(DATA.tracks.map(t=>[t.id,0]));
+  Q.forEach((q,i)=>{ const oi=answers[i]; if(oi==null) return; const o=q.options[oi]; s[o.p]+=2; s[o.s]+=1; });
+  picks.forEach(p=>s[p]+=F.bonus);
+  return DATA.tracks.map(t=>({id:t.id,score:s[t.id],match:Math.round(100*s[t.id]/MAXP[t.id])}))
+    .sort((a,b)=>b.match-a.match||b.score-a.score||((picks.includes(a.id)?0:1)-(picks.includes(b.id)?0:1))||a.id-b.id);
+}
+function averages(values){ const acc={T:[],D:[],M:[],K:[]}; ST.forEach((s,i)=>{ if(values[i]!=null) acc[s.block].push(values[i]); });
+  const a={}; BL.forEach(b=>{ const x=acc[b]; a[b]=x.length?Math.round(10*x.reduce((p,q)=>p+q,0)/x.length)/10:0; }); return a; }
+function engType(avg){ const r=DATA.typeRules, v=BL.map(b=>avg[b]), mx=Math.max(...v), mn=Math.min(...v);
+  if(mx<r.starterMax) return 'starter'; if(mx-mn<=r.universalSpread&&mn>=r.universalMin) return 'universal';
+  const o=[...BL].sort((a,b)=>avg[b]-avg[a]||BL.indexOf(a)-BL.indexOf(b)); return r.pairMap[[o[0],o[1]].sort((a,b)=>BL.indexOf(a)-BL.indexOf(b)).join('+')]; }
+function weakest(avg,keys){ let w=keys[0]; for(const k of keys) if(avg[k]<avg[w]) w=k; return w; }
+const fits=(o,g)=>o.g[0]<=g&&o.g[1]>=g;
+function contests(track,g){ return track.olympiads.map(id=>DATA.olympiads[id]).map(o=>({...o,fit:fits(o,g)})).sort((a,b)=>(b.fit?1:0)-(a.fit?1:0)); }
+function whereText(t,g,school,ci){ if(school==='itsh') return t.itsh; return t.any[g<=2?'12':'34']+(ci.spb?'. '+t.spb:''); }
+function buildPlan(r){
+  const t=r.top, g=r.grade, ols=r.contests, fit=ols.find(o=>o.fit);
+  const short=[
+    {c:'club',x:whereText(t,g,r.school,r.ci),w:'кружок рядом с домом или школой'},
+    {c:'olymp',x:fit?fit.name:'Олимпиада Учи.ру для своего класса',w:'конкурс для твоего класса'},
+    {c:'project',x:t.project,w:'проект на этот год'},
+    {c:'hard',x:DATA.steps[r.hd][0],w:'Hard skill — «'+BLOCK[r.hd].name+'»'},
+    {c:'soft',x:DATA.steps[r.sd][0],w:'Soft skill — «'+BLOCK[r.sd].name+'»'},
+    {c:'prof',x:'Спроси у взрослых, кем они работают, и запиши три профессии, которые тебя удивили',w:'знакомство с профессиями'},
+  ];
+  if(r.ci.spb) short.splice(3,0,{c:'olymp',x:'Сделай проект для конкурса «Интеллект будущего», направление «Мои первые открытия» (ИТШ № 777)',w:'конкурс Санкт-Петербурга'});
+  const mid=[
+    {c:'olymp',x:g<4?DATA.olympiads.vsosh4.name:DATA.next.ntoj.name+' — '+DATA.next.ntoj.url.replace('https://',''),w:'конкурс на следующие годы'},
+    {c:'club',x:'В 5 классе — кружок посерьёзнее: Кванториум, IT-куб или центр технического творчества (возраст приёма уточни в своём центре)',w:'следующая ступень'},
+    {c:'project',x:'Большой исследовательский проект для конкурса «Я — исследователь!» или школьной конференции',w:'проект на 1–2 года'},
+    {c:'hard',x:DATA.steps[r.hd][1],w:'Hard skill — «'+BLOCK[r.hd].name+'»'},
+    {c:'soft',x:DATA.steps[r.sd][1],w:'Soft skill — «'+BLOCK[r.sd].name+'»'},
+    {c:'school',x:'Главные школьные предметы юного инженера — математика, окружающий мир и труд (технология). Учись с интересом: они пригодятся в 5 классе',w:'учёба'},
+  ];
+  return {short,mid};
+}
+const CAT={club:'Кружок',olymp:'Конкурс',project:'Проект',hard:'Hard skill',soft:'Soft skill',prof:'Профессии',school:'Учёба'};
+function compute(st){
+  const ranked=rank(st.answers,st.picks), avg=averages(st.skills), top=TR[ranked[0].id], ci=cityInfo(st.school,st.city);
+  const r={ranked,avg,top,type:engType(avg),hd:weakest(avg,HARD),sd:weakest(avg,SOFT),grade:st.grade,school:st.school,ci,contests:contests(top,st.grade)};
+  r.plan=buildPlan(r); return r;
+}
+
+/* ---------- код результата ---------- */
+function b64u(s){ return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+function unb64u(s){ return decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/')))); }
+function encodeResult(st){
+  let c='K1'+st.grade+(st.school==='itsh'?'i':'a')+(st.before==null?'x':st.before)+(st.hero||'o')+
+    st.answers.map(a=>a==null?'x':a).join('')+st.picks.map(id=>String.fromCharCode(96+id)).join('')+st.skills.map(v=>v==null?'x':v).join('')+
+    DATA.feedback.map(f=>st.fb[f.id]==null?'x':st.fb[f.id]).join('');
+  const e={}; if(st.school!=='itsh'&&st.city) e.c=st.city; if(st.klass) e.k=st.klass;
+  if(Object.keys(e).length) c+='.'+b64u(JSON.stringify(e));
+  return c;
+}
+function decodeResult(str){ try{
+  const m=String(str).match(/K1[1-4][ia][0-2x][roygbv][0-9a-hx.A-Za-z_-]*/); if(!m) return null;
+  const [body,ext]=m[0].split('.'); const grade=+body[2], school=body[3]==='i'?'itsh':'any', before=body[4]==='x'?null:+body[4], hero=body[5];
+  let p=6; const answers=[...body.slice(p,p+Q.length)].map(x=>x==='x'?null:+x); p+=Q.length;
+  const picks=[...body.slice(p,p+2)].map(ch=>ch.charCodeAt(0)-96); p+=2;
+  const skills=[...body.slice(p,p+ST.length)].map(x=>x==='x'?null:+x); p+=ST.length;
+  const fbs=body.slice(p,p+DATA.feedback.length);
+  if(answers.length!==Q.length||answers.some((a,i)=>a==null||a>=Q[i].options.length)||picks.some(x=>!TR[x])||skills.length!==ST.length||skills.some(v=>v==null)||fbs.length!==DATA.feedback.length) return null;
+  const fb={}; DATA.feedback.forEach((f,i)=>{ if(fbs[i]!=='x') fb[f.id]=+fbs[i]; });
+  let e={}; if(ext){ try{ e=JSON.parse(unb64u(ext)); }catch(_){} }
+  return {grade,school,before,hero,answers,picks,skills,fb,city:e.c||'',klass:e.k||'',code:m[0]};
+}catch(e){ return null; } }
+function extractCodes(t){ return String(t).match(/K1[1-4][ia][0-2x][roygbv][0-9a-hx]+(?:\.[A-Za-z0-9_-]+)?/g)||[]; }
+function baseUrl(){ return location.origin+location.pathname; }
+function resultUrl(){ return baseUrl()+'#r='+encodeResult(S); }
+
+/* ---------- состояние ---------- */
+const PARAMS=new URLSearchParams(location.search);
+const S={screen:'start',grade:null,school:null,city:'',klass:(PARAMS.get('k')||'').slice(0,24),name:'',hero:'o',before:null,qi:0,si:0,answers:[],picks:[],skills:[],fb:{},fbSent:false,order:null};
+function newRun(){ Object.assign(S,{qi:0,si:0,answers:Array(Q.length).fill(null),picks:[],skills:Array(ST.length).fill(null),fb:{},fbSent:false});
+  let x=(Date.now()>>>0)||1; const rnd=()=>{x^=x<<13;x^=x>>>17;x^=x<<5;return ((x>>>0)%1000)/1000;};
+  S.order=Q.map(q=>{ const a=q.options.map((_,i)=>i); for(let i=a.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }); }
+function done(){ return S.skills.length&&S.skills.every(v=>v!=null)&&S.picks.length===2; }
+const view=document.getElementById('view'), hud=document.getElementById('hud');
+function go(s){ S.screen=s; render(); window.scrollTo({top:0,behavior:REDUCED?'auto':'smooth'}); }
+function answered(){ return S.answers.filter(a=>a!=null).length+(S.picks.length===2?1:0)+S.skills.filter(v=>v!=null).length; }
+function renderHud(show){
+  if(!show){ hud.innerHTML=''; hud.hidden=true; return; } hud.hidden=false;
+  const n=answered(); let slots=''; for(let i=0;i<TOTAL;i++) slots+='<i class="'+(i<n?'on':'')+(i<n&&(i+1)%5===0?' lvl':'')+'"></i>';
+  hud.innerHTML='<div class="hero-mini">'+heroSVG(S.hero)+'</div><div class="hotbar" id="hotbar" style="grid-template-columns:repeat('+TOTAL+',1fr)">'+slots+'</div><div class="hud-txt">'+Math.min(n+1,TOTAL)+' / '+TOTAL+'</div>';
+}
+function flyBlock(el){ if(REDUCED||!el) return; const slot=document.querySelector('#hotbar i:nth-child('+(answered()+1)+')'); if(!slot) return;
+  const a=el.getBoundingClientRect(), b=slot.getBoundingClientRect(), d=document.createElement('div'); d.className='flyblock';
+  d.style.left=(a.left+a.width/2-11)+'px'; d.style.top=(a.top+a.height/2-11)+'px'; document.body.appendChild(d);
+  d.animate([{transform:'translate(0,0) rotate(0)'},{transform:'translate('+(b.left+b.width/2-a.left-a.width/2)+'px,'+(b.top+b.height/2-a.top-a.height/2)+'px) rotate(180deg) scale(.6)'}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'}).onfinish=()=>d.remove(); }
+function speak(text){ try{ if(!('speechSynthesis' in window)) throw 0; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang='ru-RU'; u.rate=.95;
+  const v=speechSynthesis.getVoices().find(v=>/^ru/i.test(v.lang)); if(v) u.voice=v; speechSynthesis.speak(u); }catch(e){ toast('На этом устройстве озвучка недоступна — попроси взрослого прочитать вопрос.'); } }
+
+/* ---------- экраны ---------- */
+const SCR={start,who,q:scrQ,pick,levelup,skill,building,result,parent,myqr,send,teacher,dashboard,about};
+function render(){ renderHud(['q','pick','levelup','skill'].includes(S.screen)); view.innerHTML=(SCR[S.screen]||start)(); after[S.screen]&&after[S.screen](); }
+const after={};
+function start(){
+  return '<div class="card fade"><div class="start"><div><div class="eyebrow">Профориентация · 1–4 класс</div><h1>Созвездие</h1>'+
+    '<div class="subt">Конструктор компетенций юного инженера</div>'+
+    '<p style="margin-top:12px">Пройди игру-тестирование: ответь на вопросы, собери кубики — и получи свой «Индивидуальный план развития инженерных компетенций»: кем можно стать, какие у тебя суперсилы и что попробовать в этом году.</p>'+
+    '<p class="small muted">8 инженерных миров · 5–7 минут · без регистрации · можно проходить вместе со взрослым</p>'+
+    (S.klass?'<p><span class="chip orange">Класс: '+esc(S.klass)+'</span></p>':'')+
+    '<div class="row" style="margin-top:14px"><button class="btn green" data-act="start">▶ Играть</button></div>'+
+    '<div class="row" style="margin-top:10px"><button class="btn link" data-act="teacher">Провести в классе</button><button class="btn link" data-act="dashboard">Результаты класса</button><button class="btn link" data-act="about">О проекте</button></div></div>'+
+    '<div class="start-art">'+heroSVG('b','happy')+heroSVG('o','happy')+heroSVG('g','happy')+'</div></div></div>';
+}
+function who(){
+  const need=S.school==='any', ready=S.grade&&S.school&&(!need||normCity(S.city))&&S.before!=null;
+  return '<div class="card fade"><h2>Создай своего героя-инженера</h2>'+
+    '<div class="field"><span class="label">Выбери цвет героя</span><div class="heroes">'+DATA.heroes.map(h=>'<button data-hero="'+h.key+'" class="'+(S.hero===h.key?'sel':'')+'" aria-label="'+esc(h.name)+'">'+heroSVG(h.key)+'</button>').join('')+'</div></div>'+
+    '<div class="field"><span class="label">В каком ты классе?</span><div class="seg" style="grid-template-columns:repeat(4,1fr)">'+DATA.meta.grades.map(g=>'<button data-grade="'+g+'" class="'+(S.grade===g?'sel':'')+'">'+g+'<small>класс</small></button>').join('')+'</div></div>'+
+    '<div class="field"><span class="label">Где ты учишься?</span><div class="seg school">'+DATA.meta.schools.map(s=>'<button data-school="'+s.key+'" class="'+(S.school===s.key?'sel':'')+'">'+esc(s.label)+'<small>'+esc(s.sub)+'</small></button>').join('')+'</div>'+
+    (need?'<input class="inp" id="cityIn" style="margin-top:10px" maxlength="40" placeholder="Твой город" value="'+esc(S.city)+'" autocomplete="off">':'')+'</div>'+
+    '<div class="field"><span class="label">Как тебя зовут? <span class="muted small">(можно не писать)</span></span><input class="inp" id="nameIn" maxlength="20" placeholder="Имя" value="'+esc(S.name)+'"></div>'+
+    '<div class="field"><span class="label">'+esc(DATA.before.text)+'</span><div class="seg" style="grid-template-columns:repeat(3,1fr)">'+DATA.before.options.map((o,i)=>'<button data-before="'+i+'" class="'+(S.before===i?'sel':'')+'" style="font-size:16px">'+esc(o)+'</button>').join('')+'</div></div>'+
+    '<div class="row" style="margin-top:18px;align-items:center"><button class="btn green" id="goBtn" data-act="who-next" '+(ready?'':'disabled')+'>Поехали! ▶</button><span class="small muted" id="goHint">'+(ready?'':'Выбери класс, школу'+(need?', город':'')+' и ответь на вопрос')+'</span></div>'+
+    '<button class="btn link" data-act="home" style="margin-top:6px">← Назад</button></div>';
+}
+function scrQ(){
+  const q=Q[S.qi], ord=S.order[S.qi];
+  return '<div class="card fade"><span class="chip blue">Мир интересов · вопрос '+(S.qi+1)+' из '+Q.length+'</span>'+
+    '<div class="qhead"><div class="qtext">'+esc(q.text)+'</div><button class="speak" data-act="speak" aria-label="Прочитать вслух">🔊</button></div>'+
+    '<div class="tiles">'+ord.map(oi=>{const o=q.options[oi];return '<button class="tile'+(S.answers[S.qi]===oi?' sel':'')+'" data-opt="'+oi+'"><span class="ic">'+o.emoji+'</span>'+esc(o.text)+'</button>';}).join('')+'</div>'+
+    '<button class="btn link" data-act="q-back" style="margin-top:10px">← Назад</button></div>';
+}
+function pick(){
+  return '<div class="card fade"><span class="chip orange">Бонус-уровень</span><div class="qhead"><div class="qtext">'+esc(F.text)+'</div><button class="speak" data-act="speak" aria-label="Прочитать вслух">🔊</button></div>'+
+    '<div class="tiles picks">'+F.options.map(o=>'<button class="tile'+(S.picks.includes(o.track)?' sel':'')+'" data-pick="'+o.track+'"><span class="ic">'+TR[o.track].emoji+'</span>'+esc(o.text)+'</button>').join('')+'</div>'+
+    '<div class="row" style="margin-top:14px;align-items:center"><button class="btn green" data-act="pick-next" '+(S.picks.length===2?'':'disabled')+'>Дальше ▶</button><span class="small muted">выбрано '+S.picks.length+' из 2</span></div>'+
+    '<button class="btn link" data-act="pick-back">← Назад</button></div>';
+}
+function levelup(){
+  return '<div class="card fade levelup">'+'<div style="width:120px;margin:0 auto">'+heroSVG(S.hero,'happy')+'</div><div class="big">Уровень пройден!</div>'+
+    '<p>Ты собрал '+answered()+' кубиков. Теперь '+ST.length+' коротких вопросов про тебя. Правильных ответов нет — отвечай честно.</p>'+
+    '<button class="btn green" data-act="level-next">Дальше ▶</button></div>';
+}
+function skill(){
+  const s=ST[S.si];
+  return '<div class="card fade"><span class="chip green">Мир суперсил · '+(S.si+1)+' из '+ST.length+'</span>'+
+    '<div class="qhead"><div class="qtext">'+esc(s.text)+'</div><button class="speak" data-act="speak" aria-label="Прочитать вслух">🔊</button></div>'+
+    '<div class="scale3">'+DATA.scale.map(v=>'<button data-val="'+v.value+'" class="'+(S.skills[S.si]===v.value?'sel':'')+'"><span>'+v.emoji+'</span>'+esc(v.label)+'</button>').join('')+'</div>'+
+    '<button class="btn link" data-act="skill-back" style="margin-top:10px">← Назад</button></div>';
+}
+function building(){ const r=compute(S);
+  return '<div class="card fade levelup"><div class="skyp" style="max-width:260px;margin:0 auto;display:block">'+constSVG(r.top)+'</div><div class="big" style="margin-top:12px">Собираем твоё созвездие…</div><p class="muted">Считаем кубики и готовим план</p></div>'; }
+function bars(v,cls){ const n=Math.max(1,Math.round(v)); let h=''; for(let i=1;i<=5;i++) h+='<i class="'+(i<=n?'on':'')+'"></i>'; return h; }
+function lvl(v){ return v>=3.8?'сильная сторона':(v>=2.5?'развивается':'будем прокачивать'); }
+function power(r,kind){
+  const keys=kind==='hard'?HARD:SOFT, def=kind==='hard'?r.hd:r.sd;
+  return '<div class="pw '+kind+'"><h3>'+(kind==='hard'?'Hard skills — умения мастера':'Soft skills — умения в команде')+'</h3>'+
+    keys.map(k=>'<div class="bar'+(k===def?' grow':'')+'"><div class="bl"><span>'+esc(BLOCK[k].name)+'</span><span class="small">'+lvl(r.avg[k])+'</span></div><div class="bt">'+bars(r.avg[k])+'</div><div class="small muted">'+esc(BLOCK[k].desc)+(k===def?' · <span class="tag">прокачать первым</span>':'')+'</div></div>').join('')+'</div>';
+}
+function qlist(items){ return '<ul class="qlist">'+items.map(s=>'<li><span class="qc '+s.c+'">'+esc(CAT[s.c])+'</span>'+esc(s.x)+'<em>'+esc(s.w)+'</em></li>').join('')+'</ul>'; }
+function edu(r){
+  const t=r.top, ci=r.ci; let h='';
+  if(ci.spb){ h+='<div class="kv"><div class="k">Вузы Санкт-Петербурга</div>'+t.unis.map(esc).join(' · ')+'</div>';
+    h+='<div class="kv"><div class="k">Колледжи Санкт-Петербурга (СПО)</div>'+t.spo.map(s=>esc(s.name)+'<small>'+esc(s.spec)+'</small>').join('')+'</div>'; }
+  else if(ci.known){ h+='<div class="kv"><div class="k">Технические вузы: '+esc(ci.known.name)+'</div>'+ci.known.unis.map(esc).join(' · ')+'<small>Проверьте на сайте вуза, есть ли такое направление.</small></div>'; }
+  else h+='<div class="kv"><div class="k">Вузы и колледжи '+(ci.name?'рядом с городом «'+esc(ci.name)+'»':'вашего региона')+'</div>Проверенного списка для этого города пока нет<small>Смотрите технические вузы и колледжи своего региона.</small></div>';
+  h+='<div class="kv"><div class="k">Федеральные вузы</div>'+t.fed.map(esc).join(' · ')+'</div>';
+  h+='<div class="kv"><div class="k">Колледжи по всей России</div>'+esc(DATA.profi.name)+' — <a href="'+esc(DATA.profi.url)+'" target="_blank" rel="noopener">япроф.рф</a></div>';
+  return h;
+}
+function result(){
+  const r=compute(S), ty=DATA.types[r.type], t=r.top, date=new Date().toLocaleDateString('ru-RU');
+  const also=r.ranked.slice(1,3).map(x=>{const a=TR[x.id]; return '<div>'+a.emoji+' '+esc(a.name)+'<small>'+esc(a.what)+'</small></div>';}).join('');
+  return '<div class="card fade">'+
+    '<div class="res-head"><div class="hero-big">'+heroSVG(S.hero,'happy')+'</div><div><div class="eyebrow">'+esc(DATA.meta.product)+'</div>'+
+      '<h1 style="font-size:clamp(26px,4.6vw,38px)">'+(S.name?esc(S.name)+', твой':'Твой')+' мир — «'+esc(t.name)+'»</h1>'+
+      '<p class="small muted" style="margin-top:6px">'+S.grade+' класс · '+(r.school==='itsh'?'ИТШ № 777, Санкт-Петербург':esc(r.ci.name||'другая школа'))+(S.klass?' · класс '+esc(S.klass):'')+' · '+date+'</p></div></div>'+
+    '<div class="sec"><div class="sec-t"><span class="n">1</span><h2>Твоё инженерное направление</h2></div>'+
+      '<div class="skyp">'+constSVG(t)+'<div><h3>'+t.emoji+' '+esc(t.name)+'</h3><p style="margin:6px 0 0">'+esc(t.what)+'</p>'+
+      '<div class="bigdirs">Во взрослом мире это: '+t.big.map(k=>esc(DATA.meta.bigGroups[k])).join(', ')+'</div></div></div>'+
+      '<div class="small" style="margin-top:10px;font-weight:800">Ещё тебе может понравиться:</div><div class="also">'+also+'</div></div>'+
+    '<div class="sec"><div class="sec-t"><span class="n">2</span><h2>Кем можно стать</h2></div><div class="profs">'+t.profs.map(p=>{const [a,b]=p.split(' — ');return '<div class="prof"><b>'+esc(a)+'</b>'+esc(b||'')+'</div>';}).join('')+'</div></div>'+
+    '<div class="sec"><div class="sec-t"><span class="n">3</span><h2>Твои суперсилы</h2></div><div class="powers">'+power(r,'hard')+power(r,'soft')+'</div>'+
+      '<div class="type"><div class="eyebrow" style="color:var(--ink)">Ты сейчас</div><h3>'+ty.emoji+' '+esc(ty.name)+'</h3><p style="margin:4px 0 0">'+esc(ty.desc)+'</p></div></div>'+
+    '<div class="sec"><div class="sec-t"><span class="n">4</span><h2>План развития — твои квесты</h2></div><div class="quest"><div><h3>🟨 На этот учебный год</h3>'+qlist(r.plan.short)+'</div><div><h3>🟧 На 1–3 года вперёд</h3>'+qlist(r.plan.mid)+'</div></div>'+
+      '<div class="home"><b>Дело на эту неделю — можно сделать дома:</b> '+esc(t.home)+'</div></div>'+
+    '<div class="sec"><div class="sec-t"><span class="n">5</span><h2>Конкурсы для 1–4 класса</h2></div><ul class="olist">'+r.contests.concat(r.ci.spb?[DATA.olympiads.intellekt]:[]).map(o=>'<li class="'+(o.fit===false?'dim':'')+'">'+esc(o.name)+'<small>'+esc(o.when||'')+(o.url?' · <a href="'+esc(o.url)+'" target="_blank" rel="noopener">сайт</a>':'')+'</small></li>').join('')+'</ul>'+
+      '<p class="small muted">Сроки меняются каждый год — проверяйте на официальном сайте.</p></div>'+
+    '<div class="sec"><div class="sec-t"><span class="n">6</span><h2>Где учат таким инженерам <span class="small muted">(для взрослых)</span></h2></div>'+edu(r)+'</div>'+
+    '<div class="sec actions"><button class="btn" data-act="pdf">📄 Скачать план (PDF)</button><button class="btn blue" data-act="parent">👪 Показать родителям</button><button class="btn white" data-act="share">🔗 Поделиться</button>'+
+      '<button class="btn white" data-act="send">📤 Отправить результаты</button><button class="btn white" data-act="myqr">▦ QR для учителя</button><button class="btn link" data-act="restart">Пройти ещё раз</button></div>'+
+    '<div class="sec card" style="box-shadow:0 4px 0 var(--ink)"><h2 style="font-size:20px;margin-bottom:10px">Три вопроса напоследок</h2>'+(S.fbSent?'<p style="margin:0;font-weight:800;color:var(--grass-d)">Спасибо! Ответы добавлены в твой результат.</p>':
+      '<div class="fb">'+DATA.feedback.map(f=>'<div><div class="q">'+esc(f.text)+'</div><div class="o">'+f.options.map((o,i)=>'<button data-fb="'+f.id+'" data-fbv="'+i+'" class="'+(S.fb[f.id]===i?'sel':'')+'">'+esc(o)+'</button>').join('')+'</div></div>').join('')+
+      '<div><button class="btn green small" data-act="fb-send" '+(Object.keys(S.fb).length===DATA.feedback.length?'':'disabled')+'>Готово</button></div></div>')+'</div>'+
+    '<p class="small muted">Это не предсказание: интересы меняются. Пройди тестирование ещё раз через полгода.</p></div>';
+}
+function parent(){ const r=compute(S), P=DATA.parent;
+  return '<div class="card fade"><button class="btn link back" data-act="to-result">← К плану</button><h2>'+esc(P.title)+'</h2><p>'+esc(P.lead)+'</p>'+
+    '<div class="kv"><div class="k">Результат '+(S.name?esc(S.name):'ребёнка')+' · '+S.grade+' класс</div><b>'+r.top.emoji+' '+esc(r.top.name)+'</b>'+
+    '<small>Во взрослом мире: '+r.top.big.map(k=>esc(DATA.meta.bigGroups[k])).join(', ')+'</small><small>Прокачать в первую очередь: «'+esc(BLOCK[r.hd].name)+'» (Hard skill) и «'+esc(BLOCK[r.sd].name)+'» (Soft skill)</small><small>Первые шаги: '+r.plan.short.slice(0,3).map(s=>esc(s.x)).join(' · ')+'</small></div>'+
+    '<ul>'+P.points.map(p=>'<li>'+esc(p)+'</li>').join('')+'</ul><div class="actions"><button class="btn" data-act="pdf">📄 Скачать план (PDF)</button><button class="btn white" data-act="share">🔗 Отправить ссылку</button></div></div>'; }
+function qrSVG(text,cell){ try{ const q=qrcode(0,'M'); q.addData(text); q.make(); return q.createSvgTag({cellSize:cell||4,margin:2,scalable:true}); }catch(e){ return '<p>QR-код не построился</p>'; } }
+function myqr(){ return '<div class="card fade center"><button class="btn link back" data-act="to-result">← К плану</button><h2>QR для учителя</h2><p class="muted small">Учитель сканирует код на странице «Результаты класса». Имя в код не входит.</p><div class="qrbox big">'+qrSVG(resultUrl(),5)+'</div>'+
+  (Object.keys(S.fb).length<DATA.feedback.length?'<p class="small" style="color:#C4551A;font-weight:800">Сначала ответь на три вопроса внизу плана.</p>':'')+'</div>'; }
+function send(){ return '<div class="card fade"><button class="btn link back" data-act="to-result">← К плану</button><h2>Отправить результаты</h2>'+
+  '<p class="small muted">В результатах нет имени — только класс, ответы и итог.</p><div class="kv"><div class="k">Шаг 1</div>Файл с результатом скачан в «Загрузки».<div style="margin-top:8px"><button class="btn small white" data-act="dl">Скачать ещё раз</button></div></div>'+
+  '<div class="kv"><div class="k">Шаг 2 — вместе со взрослым</div><ol style="margin:4px 0 0"><li>Положите файл в папку класса на Яндекс Диске (нужен вход в Яндекс ID и доступ от учителя).<br><a class="btn small white" style="margin-top:6px" href="'+esc(DATA.meta.collect.yandexDiskUrl)+'" target="_blank" rel="noopener">Открыть папку</a></li>'+
+  '<li style="margin-top:8px">Или отправьте учителю файл или ссылку в мессенджере.<br><button class="btn small white" style="margin-top:6px" data-act="copy-link">Скопировать ссылку</button></li></ol></div></div>'; }
+function about(){ return '<div class="card fade"><button class="btn link back" data-act="home">← Назад</button><h2>О проекте</h2>'+
+  '<p>«Созвездие» для 1–4 класса — проект ученика 4 класса ГБОУ «ИТШ № 777» Санкт-Петербурга Абрина Владислава. Научный руководитель — Борисова Ольга Владимировна, наставник — Абрин Евгений Олегович. Это младшая версия сервиса «Созвездие» для 5–11 классов.</p>'+
+  '<h3 style="margin-top:12px">Как это работает</h3><p>10 вопросов «что тебе интересно» (по 4 картинки), выбор двух летних проектов из восьми и 8 вопросов «про тебя» со шкалой из трёх смайликов. За ответ главное направление получает 2 балла, соседнее — 1, за проект — 3. Итог делится на максимально возможный балл направления.</p>'+
+  '<h3 style="margin-top:12px">8 инженерных миров</h3><ul>'+DATA.tracks.map(t=>'<li>'+t.emoji+' '+esc(t.name)+' <span class="muted small">— '+t.big.map(k=>esc(DATA.meta.bigGroups[k])).join(', ')+'</span></li>').join('')+'</ul>'+
+  '<h3 style="margin-top:12px">Как сделан сайт</h3><p class="small">Один HTML-файл без сервера и регистрации. Сервис создан с помощью нейросетей в формате вайбкодинга: авторы придумывали и проверяли, нейросеть писала код. QR-коды — qrcode-generator, сканирование — jsQR, PDF — html2pdf.js. Конкурсы — по официальным сайтам организаторов, без точных дат.</p>'+
+  '<p class="small muted">Персональные данные не собираются.</p></div>'; }
+function teacher(){ const link=baseUrl()+(S.klass?'?k='+encodeURIComponent(S.klass):'');
+  return '<div class="card fade"><button class="btn link back" data-act="home">← Назад</button><h2>Провести в классе</h2>'+
+  '<p class="small muted">Нужны планшеты или компьютеры и 15 минут. Первоклассникам лучше проходить вместе со взрослым: в каждом вопросе есть кнопка 🔊 — «прочитать вслух».</p>'+
+  '<div class="field"><span class="label">Метка класса (можно не писать)</span><input class="inp" id="klassIn" maxlength="24" placeholder="Например: 4.3" value="'+esc(S.klass)+'"></div>'+
+  '<div class="kv center" style="margin-top:12px"><div class="k">QR-код на тестирование</div><div class="qrbox" id="classQR">'+qrSVG(link,5)+'</div><div class="small" style="word-break:break-all">'+esc(link)+'</div>'+
+  '<div class="row" style="justify-content:center;margin-top:10px"><button class="btn small white" data-act="copy-class">Скопировать ссылку</button><button class="btn small white" data-act="poster">Плакат с QR</button></div></div>'+
+  '<h3 style="margin-top:14px">Как собрать результаты</h3><ul><li><b>В классе:</b> ребёнок нажимает «QR для учителя», учитель сканирует код на странице «Результаты класса».</li>'+
+  '<li><b>Файлы:</b> «Отправить результаты» скачивает файл; соберите файлы в папку «'+esc(DATA.meta.collect.dashboardFolder)+'» и загрузите её.</li><li><b>Онлайн:</b> папка класса на Яндекс Диске или ссылки из мессенджера.</li></ul>'+
+  '<div class="row" style="margin-top:12px"><button class="btn green" data-act="dashboard">Открыть результаты класса</button></div></div>'; }
+
+/* ---------- дашборд ---------- */
+const DASH={items:[],fK:'',fG:''};
+function dLoad(){ try{ DASH.items=JSON.parse(localStorage.getItem('sozv-kids-dash')||'[]').map(decodeResult).filter(Boolean); }catch(e){} }
+function dSave(){ try{ localStorage.setItem('sozv-kids-dash',JSON.stringify(DASH.items.map(x=>x.code))); }catch(e){} }
+function dAdd(codes){ let a=0,b=0,d=0; for(const c of codes){ const j=decodeResult(c); if(!j){b++;continue;} if(DASH.items.some(x=>x.code===j.code)){d++;continue;} DASH.items.push(j); a++; } dSave(); return {a,b,d}; }
+function dFiltered(){ return DASH.items.filter(x=>(!DASH.fK||x.klass===DASH.fK)&&(!DASH.fG||String(x.grade)===DASH.fG)); }
+function stats(items){
+  const O=()=>Object.create(null), tr=O(), prof=O(), types=O(), hard={T:0,D:0}, soft={M:0,K:0}, grades=O(), before=[0,0,0], fb=O(); DATA.feedback.forEach(f=>fb[f.id]=[0,0,0]);
+  for(const it of items){ const rk=rank(it.answers,it.picks), avg=averages(it.skills), top=TR[rk[0].id];
+    tr[top.id]=(tr[top.id]||0)+1; top.profs.forEach(p=>{const n=p.split(' — ')[0]; prof[n]=(prof[n]||0)+1;}); const ty=engType(avg); types[ty]=(types[ty]||0)+1;
+    const hd=weakest(avg,HARD), sd=weakest(avg,SOFT); hard[hd]++; soft[sd]++; grades[it.grade]=(grades[it.grade]||0)+1; if(it.before!=null) before[it.before]++;
+    DATA.feedback.forEach(f=>{ if(it.fb[f.id]!=null) fb[f.id][it.fb[f.id]]++; }); Object.assign(it,{_top:top,_type:ty,_hd:hd,_sd:sd,_avg:avg}); }
+  return {n:items.length,tr,prof,types,hard,soft,grades,before,fb};
+}
+const pct=(a,n)=>n?Math.round(100*a/n):0;
+function dbars(rows,n){ return rows.map(([l,v])=>'<div class="dbar"><span>'+l+'</span><span class="dt"><i style="width:'+pct(v,n)+'%"></i></span><span class="dv">'+pct(v,n)+'% ('+v+')</span></div>').join(''); }
+function dashboard(){
+  const items=dFiltered(), s=stats(items), n=s.n, ks=[...new Set(DASH.items.map(x=>x.klass).filter(Boolean))], gs=[...new Set(DASH.items.map(x=>x.grade))].sort();
+  let body='';
+  if(!n) body='<div class="kv" style="margin-top:12px">Пока нет результатов. Добавьте их одним из способов выше'+(PREVIEW?' или загрузите пример.':'.')+(PREVIEW?'<div style="margin-top:8px"><button class="btn small white" data-act="demo">Показать пример</button></div>':'')+'</div>';
+  else body='<div class="kpis"><div><b>'+n+'</b><span>участников</span></div><div><b>'+Object.keys(s.tr).length+' из 8</b><span>инженерных миров</span></div><div><b>'+pct(s.fb.orient[0],n)+'%</b><span>лучше понимают, каким инженером можно стать</span></div><div><b>'+pct(s.fb.process[0],n)+'%</b><span>понравилось тестирование</span></div></div>'+
+    '<div class="dgrid"><div class="kv"><h3>Инженерные направления</h3>'+dbars(DATA.tracks.map(t=>[t.emoji+' '+esc(t.name),s.tr[t.id]||0]).sort((a,b)=>b[1]-a[1]),n)+'</div>'+
+    '<div class="kv"><h3>Профессии в планах</h3>'+dbars(Object.entries(s.prof).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([p,v])=>[esc(p),v]),n)+'</div>'+
+    '<div class="kv"><h3>Что прокачать первым</h3>'+dbars([['Hard: '+BLOCK.T.name,s.hard.T],['Hard: '+BLOCK.D.name,s.hard.D],['Soft: '+BLOCK.M.name,s.soft.M],['Soft: '+BLOCK.K.name,s.soft.K]],n)+'<h3 style="margin-top:10px">Классы</h3>'+dbars(gs.map(g=>[g+' класс',s.grades[g]||0]),n)+'</div>'+
+    '<div class="kv"><h3>Обратная связь</h3>'+DATA.feedback.map(f=>'<p class="small" style="margin:8px 0 2px;font-weight:800">'+esc(f.text)+'</p>'+dbars(f.options.map((o,i)=>[esc(o),s.fb[f.id][i]]),n)).join('')+'<p class="small" style="margin:8px 0 2px;font-weight:800">'+esc(DATA.before.text)+' (до тестирования)</p>'+dbars(DATA.before.options.map((o,i)=>[esc(o),s.before[i]]),n)+'</div></div>'+
+    '<div class="kv" style="margin-top:12px"><h3>Участники</h3><div class="dtable"><table><thead><tr><th>#</th><th>Класс</th><th>Метка</th><th>Направление</th><th>Тип</th><th>Hard</th><th>Soft</th></tr></thead><tbody>'+
+    items.map((x,i)=>'<tr><td>'+(i+1)+'</td><td>'+x.grade+'</td><td>'+esc(x.klass||'—')+'</td><td>'+esc(x._top.name)+'</td><td>'+esc(DATA.types[x._type].name)+'</td><td>'+esc(BLOCK[x._hd].name)+'</td><td>'+esc(BLOCK[x._sd].name)+'</td></tr>').join('')+'</tbody></table></div></div>';
+  return '<div class="card fade"><button class="btn link back" data-act="home">← Назад</button><h2>Результаты класса</h2><p class="small muted">Данные остаются в этом браузере. Имён в результатах нет.</p>'+
+    '<div class="dadd"><div class="kv"><div class="k">1 · Файлы</div><label class="btn small white">Выбрать файлы<input type="file" id="dFiles" accept=".json,.txt" multiple hidden></label> <label class="btn small white" style="margin-top:6px">Выбрать папку<input type="file" id="dDir" webkitdirectory directory multiple hidden></label></div>'+
+    '<div class="kv"><div class="k">2 · Сканировать QR</div><button class="btn small white" data-act="scan">'+(SCAN.on?'Остановить камеру':'Включить камеру')+'</button><div class="scanbox'+(SCAN.on?' on':'')+'"><video id="scanVideo" playsinline muted></video><p class="small" id="scanMsg"></p></div></div>'+
+    '<div class="kv"><div class="k">3 · Ссылки</div><textarea id="dPaste" rows="3" placeholder="Ссылки на результаты"></textarea><button class="btn small white" data-act="paste" style="margin-top:6px">Добавить</button></div></div>'+
+    (DASH.items.length?'<div class="dfilter"><label>Метка <select id="fK"><option value="">все</option>'+ks.map(k=>'<option'+(DASH.fK===k?' selected':'')+'>'+esc(k)+'</option>').join('')+'</select></label><label>Класс <select id="fG"><option value="">все</option>'+gs.map(g=>'<option'+(DASH.fG===String(g)?' selected':'')+'>'+g+'</option>').join('')+'</select></label>'+
+      '<button class="btn small white" data-act="csv">Скачать для Excel (CSV)</button><button class="btn small white" data-act="dash-print">Печать</button><button class="btn link" data-act="dash-clear">Очистить</button></div>':'')+body+'</div>';
+}
+after.dashboard=function(){
+  const on=async fs=>{ let c=[]; for(const f of fs){ if(!/\.(json|txt)$/i.test(f.name)) continue; try{ c=c.concat(extractCodes(await f.text())); }catch(e){} } const r=dAdd(c); render(); toast('Добавлено: '+r.a+(r.d?' · повторов: '+r.d:'')+(r.b?' · не распознано: '+r.b:'')); };
+  const a=document.getElementById('dFiles'), b=document.getElementById('dDir'); if(a) a.onchange=e=>on([...e.target.files]); if(b) b.onchange=e=>on([...e.target.files]);
+  const k=document.getElementById('fK'), g=document.getElementById('fG'); if(k) k.onchange=e=>{DASH.fK=e.target.value;render();}; if(g) g.onchange=e=>{DASH.fG=e.target.value;render();};
+  if(SCAN.on) scanAttach();
+};
+const SCAN={on:false,stream:null,raf:null,det:null,last:''};
+function loadScript(srcs){ return new Promise((res,rej)=>{ const l=[].concat(srcs); const nx=i=>{ if(i>=l.length) return rej(); const s=document.createElement('script'); s.src=l[i]; s.onload=res; s.onerror=()=>{s.remove();nx(i+1);}; document.head.appendChild(s); }; nx(0); }); }
+async function scanStart(){ try{ SCAN.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); }catch(e){ toast('Нет доступа к камере. Добавьте результаты файлами или ссылками.'); return; }
+  if('BarcodeDetector' in window){ try{ SCAN.det=new BarcodeDetector({formats:['qr_code']}); }catch(e){} }
+  if(!SCAN.det&&!window.jsQR){ try{ await loadScript(['lib/jsqr.min.js','jsqr.min.js','https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js']); }catch(e){ toast('Не удалось загрузить сканер.'); scanStop(); return; } }
+  SCAN.on=true; render(); }
+function scanAttach(){ const v=document.getElementById('scanVideo'); if(!v||!SCAN.stream) return; v.srcObject=SCAN.stream; v.play().catch(()=>{});
+  const c=document.createElement('canvas'), x=c.getContext('2d',{willReadFrequently:true}), msg=document.getElementById('scanMsg');
+  const tick=async()=>{ if(!SCAN.on) return; if(v.readyState>=2){ let t='';
+    try{ if(SCAN.det){ const r=await SCAN.det.detect(v); if(r[0]) t=r[0].rawValue; } else { c.width=v.videoWidth; c.height=v.videoHeight; x.drawImage(v,0,0); const r=window.jsQR(x.getImageData(0,0,c.width,c.height).data,c.width,c.height); if(r) t=r.data; } }catch(e){}
+    if(t&&t!==SCAN.last){ SCAN.last=t; const r=dAdd(extractCodes(t)); if(msg) msg.textContent=r.a?'✓ Добавлено. Всего: '+DASH.items.length:(r.d?'Этот результат уже есть':'Это не QR результата'); if(r.a){ setTimeout(()=>{ if(SCAN.on) render(); },700); return; } } }
+    SCAN.raf=requestAnimationFrame(tick); }; SCAN.raf=requestAnimationFrame(tick); }
+function scanStop(){ SCAN.on=false; cancelAnimationFrame(SCAN.raf); if(SCAN.stream) SCAN.stream.getTracks().forEach(t=>t.stop()); SCAN.stream=null; }
+function download(name,content,type){ const b=new Blob([content],{type}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500); }
+function csvCell(x){ x=String(x==null?'':x); return /[";\n]/.test(x)?'"'+x.replace(/"/g,'""')+'"':x; }
+function dashCSV(){ const items=dFiltered(), s=stats(items), n=s.n, L=[], row=a=>L.push(a.map(csvCell).join(';'));
+  row(['Результаты «Созвездие» 1–4 класс',new Date().toLocaleString('ru-RU'),'участников: '+n]); row([]);
+  row(['Направление','Человек','%']); DATA.tracks.forEach(t=>row([t.name,s.tr[t.id]||0,pct(s.tr[t.id]||0,n)])); row([]);
+  row(['Профессия','Человек','%']); Object.entries(s.prof).sort((a,b)=>b[1]-a[1]).forEach(([p,v])=>row([p,v,pct(v,n)])); row([]);
+  row(['Прокачать первым','Тип','Человек','%']); [['T','Hard skill'],['D','Hard skill'],['M','Soft skill'],['K','Soft skill']].forEach(([b,k])=>{const v=k[0]==='H'?s.hard[b]:s.soft[b]; row([BLOCK[b].name,k,v,pct(v,n)]);}); row([]);
+  row(['Вопрос',...DATA.feedback[0].options]); DATA.feedback.forEach(f=>row([f.text,...s.fb[f.id]])); row([DATA.before.text+' (до)',...s.before]); row([]);
+  row(['#','Класс','Метка','Школа','Город','Направление','Тип','Умелые руки','Цифровые умения','Смекалка','Дружба и команда','Код']);
+  items.forEach((x,i)=>row([i+1,x.grade,x.klass,x.school==='itsh'?'ИТШ № 777':'другая',x.school==='itsh'?'Санкт-Петербург':x.city,x._top.name,DATA.types[x._type].name,x._avg.T,x._avg.D,x._avg.M,x._avg.K,x.code]));
+  download('sozvezdie-1-4-svodka-'+new Date().toISOString().slice(0,10)+'.csv','﻿'+L.join('\r\n'),'text/csv;charset=utf-8'); }
+function resultFile(){ const r=compute(S), d=new Date();
+  const p={app:'sozvezdie-1-4',v:1,created:d.toISOString(),code:encodeResult(S),summary:{grade:S.grade,school:S.school==='itsh'?'ИТШ № 777':'другая',city:r.ci.name||'',klass:S.klass||'',direction:r.top.name,type:DATA.types[r.type].name}};
+  download('sozvezdie14_'+(S.klass?S.klass.replace(/[^\wА-Яа-я.-]/g,'')+'_':'')+S.grade+'kl_'+d.toISOString().slice(0,16).replace(/[-:T]/g,'')+'_'+Math.random().toString(36).slice(2,6)+'.json',JSON.stringify(p,null,1),'application/json'); }
+
+/* ---------- PDF и печать ---------- */
+function planDoc(){ const r=compute(S), t=r.top, ty=DATA.types[r.type];
+  const li=a=>'<ol>'+a.map(s=>'<li><b>'+esc(CAT[s.c])+':</b> '+esc(s.x)+'</li>').join('')+'</ol>';
+  const edu=(r.ci.spb?'<p><b>Вузы Санкт-Петербурга:</b> '+t.unis.map(esc).join(', ')+'</p><p><b>Колледжи Санкт-Петербурга:</b> '+t.spo.map(s=>esc(s.name)).join('; ')+'</p>':(r.ci.known?'<p><b>Технические вузы ('+esc(r.ci.known.name)+'):</b> '+r.ci.known.unis.map(esc).join(', ')+'</p>':''))+'<p><b>Федеральные вузы:</b> '+t.fed.map(esc).join(', ')+'</p>';
+  return '<div class="pdoc"><div class="ph">'+heroSVG(S.hero,'happy')+'<div><div class="pbrand">Созвездие · Конструктор компетенций юного инженера · 1–4 класс</div><h1>'+esc(DATA.meta.product)+'</h1><p class="pmeta">'+(S.name?esc(S.name)+' · ':'')+S.grade+' класс · '+(r.school==='itsh'?'ИТШ № 777, Санкт-Петербург':esc(r.ci.name||'другая школа'))+' · '+new Date().toLocaleDateString('ru-RU')+'</p></div></div>'+
+    '<div class="ptwo"><div><h2>1. Направление: '+t.emoji+' '+esc(t.name)+'</h2><p>'+esc(t.what)+'</p><p><b>Во взрослом мире:</b> '+t.big.map(k=>esc(DATA.meta.bigGroups[k])).join(', ')+'</p><p><b>Ещё может понравиться:</b> '+r.ranked.slice(1,3).map(x=>esc(TR[x.id].name)).join('; ')+'</p>'+
+    '<h2>2. Кем можно стать</h2><ul>'+t.profs.map(p=>'<li>'+esc(p)+'</li>').join('')+'</ul></div><div>'+constSVG(t)+'</div></div>'+
+    '<h2>3. Суперсилы</h2><p><b>Hard skills:</b> '+HARD.map(k=>esc(BLOCK[k].name)+' — '+lvl(r.avg[k])).join('; ')+'. <b>Soft skills:</b> '+SOFT.map(k=>esc(BLOCK[k].name)+' — '+lvl(r.avg[k])).join('; ')+'.</p><p><b>Прокачать первым:</b> «'+esc(BLOCK[r.hd].name)+'» и «'+esc(BLOCK[r.sd].name)+'». <b>Ты сейчас:</b> '+esc(ty.name)+' — '+esc(ty.desc)+'</p>'+
+    '<h2>4. План развития</h2><h3>На этот учебный год</h3>'+li(r.plan.short)+'<h3>На 1–3 года вперёд</h3>'+li(r.plan.mid)+'<p><b>Дело на эту неделю:</b> '+esc(t.home)+'</p>'+
+    '<h2>5. Конкурсы для 1–4 класса</h2><ul>'+r.contests.filter(o=>o.fit).concat(r.ci.spb?[DATA.olympiads.intellekt]:[]).map(o=>'<li>'+esc(o.name)+(o.when?' — '+esc(o.when):'')+'</li>').join('')+'</ul>'+
+    '<h2>6. Где учат таким инженерам (для взрослых)</h2>'+edu+'<p class="pnote">Сроки конкурсов меняются каждый год — проверяйте на официальных сайтах. Это не предсказание: интересы меняются, пройдите тестирование ещё раз через полгода.</p>'+
+    '<div class="pfoot">Сервис «Созвездие» для 1–4 класса · проект ученика 4 класса ГБОУ «ИТШ № 777» · '+esc(baseUrl())+'</div></div>'; }
+function inlineSvg(root){ root.querySelectorAll('svg').forEach(svg=>{ const cs=getComputedStyle(svg); svg.setAttribute('width',parseFloat(cs.width)||120); svg.setAttribute('height',parseFloat(cs.height)||120); }); }
+async function doPDF(){ const html=planDoc(); document.getElementById('printSheet').innerHTML=html; toast('Готовим PDF…');
+  try{ if(!window.html2pdf) await loadScript(['lib/html2pdf.bundle.min.js','html2pdf.bundle.min.js','https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js']);
+    const y=window.scrollY; window.scrollTo(0,0); const h=document.createElement('div'); h.className='pdf-holder'; h.innerHTML=html; document.body.appendChild(h); inlineSvg(h);
+    await window.html2pdf().set({margin:[10,10,12,10],filename:'Plan_Sozvezdie_1-4_'+S.grade+'kl.pdf',image:{type:'jpeg',quality:.95},html2canvas:{scale:2,backgroundColor:'#ffffff',scrollX:0,scrollY:0},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['avoid-all']}}).from(h.firstChild).save();
+    h.remove(); window.scrollTo(0,y); toast('PDF сохранён в «Загрузки».'); }catch(e){ toast('Откроется печать — выберите «Сохранить как PDF».'); setTimeout(()=>{try{window.print();}catch(_){}},300); } }
+function doPoster(){ const link=baseUrl()+(S.klass?'?k='+encodeURIComponent(S.klass):'');
+  document.getElementById('printSheet').innerHTML='<div class="pdoc poster"><div class="pbrand">Созвездие · 1–4 класс</div><h1>Конструктор компетенций юного инженера</h1><p class="big">Наведи камеру на код, пройди игру-тестирование и получи свой план развития юного инженера!</p><div class="pqr">'+qrSVG(link,8)+'</div><p>'+esc(link)+'</p>'+(S.klass?'<p>Класс: '+esc(S.klass)+'</p>':'')+'</div>';
+  setTimeout(()=>{try{window.print();}catch(e){}},80); }
+function dashPrint(){ const s=stats(dFiltered()), n=s.n, tb=(t,rows)=>'<h2>'+t+'</h2><table class="ptbl">'+rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+pct(r[1],n)+'%</td></tr>').join('')+'</table>';
+  document.getElementById('printSheet').innerHTML='<div class="pdoc"><div class="pbrand">Созвездие · 1–4 класс · результаты класса</div><h1>Участников: '+n+'</h1>'+tb('Направления',DATA.tracks.map(t=>[esc(t.name),s.tr[t.id]||0]))+tb('Что прокачать первым',[[BLOCK.T.name,s.hard.T],[BLOCK.D.name,s.hard.D],[BLOCK.M.name,s.soft.M],[BLOCK.K.name,s.soft.K]])+tb(esc(DATA.feedback[2].text),DATA.feedback[2].options.map((o,i)=>[o,s.fb.orient[i]]))+'</div>';
+  setTimeout(()=>{try{window.print();}catch(e){}},80); }
+
+/* ---------- события ---------- */
+function copyText(t,ok){ const fb=()=>{ const a=document.createElement('textarea'); a.value=t; document.body.appendChild(a); a.select(); let r=false; try{r=document.execCommand('copy');}catch(e){} a.remove(); toast(r?ok:'Скопируйте: '+t); };
+  try{ navigator.clipboard.writeText(t).then(()=>toast(ok)).catch(fb); }catch(e){ fb(); } }
+async function doShare(){ const url=resultUrl(); if(navigator.share){ try{ await navigator.share({title:'Созвездие — мой план',text:'Мой план юного инженера: «'+compute(S).top.name+'»',url}); return; }catch(e){ if(e&&e.name==='AbortError') return; } } copyText(url,'Ссылка на план скопирована.'); }
+function keep(){ const n=document.getElementById('nameIn'); if(n) S.name=n.value.trim().slice(0,20); const c=document.getElementById('cityIn'); if(c) S.city=c.value.trim().slice(0,40); }
+function whoReady(){ return S.grade&&S.school&&(S.school!=='any'||normCity(S.city))&&S.before!=null; }
+view.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const d=b.dataset;
+  if(d.hero){ keep(); S.hero=d.hero; render(); return; }
+  if(d.grade){ keep(); S.grade=+d.grade; render(); return; }
+  if(d.school){ keep(); S.school=d.school; render(); return; }
+  if(d.before!=null){ keep(); S.before=+d.before; render(); return; }
+  if(d.opt!=null){ S.answers[S.qi]=+d.opt; b.classList.add('sel'); flyBlock(b); setTimeout(()=>{ if(S.qi<Q.length-1){S.qi++; go('q');} else go('pick'); },REDUCED?60:360); return; }
+  if(d.pick!=null){ const t=+d.pick; if(S.picks.includes(t)) S.picks=S.picks.filter(x=>x!==t); else if(S.picks.length<2) S.picks.push(t); const y=window.scrollY; render(); window.scrollTo(0,y); if(S.picks.length===2) flyBlock(b); return; }
+  if(d.val!=null){ S.skills[S.si]=+d.val; b.classList.add('sel'); flyBlock(b); setTimeout(()=>{ if(S.si<ST.length-1){S.si++; go('skill');} else { go('building'); setTimeout(()=>{ if(S.screen==='building') go('result'); },REDUCED?500:2200); } },REDUCED?60:320); return; }
+  if(d.fb){ S.fb[d.fb]=+d.fbv; const y=window.scrollY; render(); window.scrollTo(0,y); return; }
+  switch(d.act){
+    case 'start': newRun(); go('who'); break;
+    case 'home': scanStop(); go(done()?'result':'start'); break;
+    case 'about': go('about'); break; case 'teacher': go('teacher'); break;
+    case 'dashboard': dLoad(); go('dashboard'); break;
+    case 'who-next': keep(); if(whoReady()){ S.qi=0; go('q'); } break;
+    case 'speak': speak(S.screen==='q'?Q[S.qi].text+'. '+S.order[S.qi].map(i=>Q[S.qi].options[i].text).join('. '):(S.screen==='skill'?ST[S.si].text+'. Не про меня. Иногда. Да, это я!':F.text+'. '+F.options.map(o=>o.text).join('. '))); break;
+    case 'q-back': if(S.qi>0){ S.answers[S.qi]=null; S.qi--; S.answers[S.qi]=null; go('q'); } else go('who'); break;
+    case 'pick-next': if(S.picks.length===2) go('levelup'); break;
+    case 'pick-back': S.picks=[]; S.qi=Q.length-1; S.answers[S.qi]=null; go('q'); break;
+    case 'level-next': S.si=0; go('skill'); break;
+    case 'skill-back': if(S.si>0){ S.skills[S.si]=null; S.si--; S.skills[S.si]=null; go('skill'); } else go('levelup'); break;
+    case 'to-result': go('result'); break;
+    case 'restart': history.replaceState(null,'',location.pathname+location.search); Object.assign(S,{grade:null,school:null,city:'',name:'',before:null}); go('start'); break;
+    case 'parent': go('parent'); break;
+    case 'pdf': if(!previewOnly('Скачивание PDF')) doPDF(); break;
+    case 'share': if(!previewOnly('«Поделиться»')) doShare(); break;
+    case 'send': if(!PREVIEW) resultFile(); go('send'); break;
+    case 'dl': if(!previewOnly('Скачивание файла')) resultFile(); break;
+    case 'copy-link': if(!previewOnly('Ссылка на результат')) copyText(resultUrl(),'Ссылка скопирована — отправьте её учителю.'); break;
+    case 'myqr': go('myqr'); break;
+    case 'fb-send': S.fbSent=true; { const y=window.scrollY; render(); window.scrollTo(0,y); } toast('Спасибо!'); break;
+    case 'poster': if(!previewOnly('Печать плаката')) doPoster(); break;
+    case 'copy-class': copyText(baseUrl()+(S.klass?'?k='+encodeURIComponent(S.klass):''),'Ссылка на тестирование скопирована.'); break;
+    case 'scan': if(previewOnly('Сканирование камерой')) break; if(SCAN.on){ scanStop(); render(); } else scanStart(); break;
+    case 'paste': { const r=dAdd(extractCodes(document.getElementById('dPaste').value)); render(); toast('Добавлено: '+r.a+(r.d?' · повторов: '+r.d:'')+(r.b?' · не распознано: '+r.b:'')); } break;
+    case 'demo': { const out=[], rnd=n=>Math.floor(Math.random()*n); for(let i=0;i<26;i++){ const a=1+rnd(8); let c=1+rnd(8); if(c===a) c=a%8+1;
+        out.push(encodeResult({grade:1+rnd(4),school:'itsh',city:'',klass:'пример',before:rnd(3),hero:'roygbv'[rnd(6)],answers:Q.map(q=>rnd(4)),picks:[a,c],skills:ST.map(()=>[1,3,5][rnd(3)]),fb:{process:rnd(3),plan:rnd(3),orient:rnd(3)}})); }
+      dAdd(out); render(); } break;
+    case 'csv': if(!previewOnly('Выгрузка CSV')) dashCSV(); break;
+    case 'dash-print': if(!previewOnly('Печать')) dashPrint(); break;
+    case 'dash-clear': DASH.items=[]; dSave(); render(); break;
+  }
+});
+view.addEventListener('input',e=>{ const id=e.target.id;
+  if(id==='nameIn') S.name=e.target.value;
+  if(id==='cityIn'){ S.city=e.target.value; const g=document.getElementById('goBtn'), h=document.getElementById('goHint'); if(g) g.disabled=!whoReady(); if(h) h.textContent=whoReady()?'':'Выбери класс, школу, город и ответь на вопрос'; }
+  if(id==='klassIn'){ S.klass=e.target.value.trim().slice(0,24); const q=document.getElementById('classQR'); if(q) q.innerHTML=qrSVG(baseUrl()+(S.klass?'?k='+encodeURIComponent(S.klass):''),5); }
+});
+function toast(m){ document.querySelectorAll('.toast').forEach(t=>t.remove()); const t=document.createElement('div'); t.className='toast'; t.setAttribute('role','status'); t.innerHTML='<button class="x" aria-label="Закрыть">×</button>'+esc(m); document.body.appendChild(t); t.querySelector('.x').onclick=()=>t.remove(); setTimeout(()=>t.remove(),6000); }
+window.addEventListener('afterprint',()=>{ document.getElementById('printSheet').innerHTML=''; });
+function route(){ const m=location.hash.match(/r=([A-Za-z0-9_.-]+)/);
+  if(m){ const j=decodeResult(m[1]); if(j){ Object.assign(S,{grade:j.grade,school:j.school,before:j.before,hero:j.hero,answers:j.answers,picks:j.picks,skills:j.skills,fb:j.fb,city:j.city,klass:j.klass,fbSent:Object.keys(j.fb).length===DATA.feedback.length,screen:'result'}); } }
+  else if(/dashboard/.test(location.hash)){ dLoad(); S.screen='dashboard'; } else if(/teacher/.test(location.hash)) S.screen='teacher';
+  render(); }
+window.addEventListener('hashchange',route); route();
+
+</script>
+</body>
+</html>
