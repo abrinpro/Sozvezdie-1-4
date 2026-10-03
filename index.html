@@ -384,12 +384,22 @@ async function xlsxText(buf){
 async function fileCodes(f){
   if(/\.xlsx$/i.test(f.name)){
     if(!('DecompressionStream' in window)) throw new Error('noxlsx');
-    return extractCodes(await xlsxText(await f.arrayBuffer()));
+    const txt=await xlsxText(await f.arrayBuffer()); if(!extractCodes(txt).length && OTHER_RE.test(txt)) FILE_OTHER=true; return extractCodes(txt);
   }
-  return extractCodes(await f.text());
+  const txt=await f.text(); if(!extractCodes(txt).length && OTHER_RE.test(txt)) FILE_OTHER=true; return extractCodes(txt);
 }
 const FILE_RE=/\.(json|txt|csv|xlsx)$/i;
-function isEntryQR(t){ t=String(t||''); return !extractCodes(t).length && (/sozvezdie/i.test(t) || t.indexOf(baseUrl())===0); }
+const OTHER_RE=/S4[tm][5-9AB][ia][0-2x]/, OTHER_NAME='«Созвездия» для 5–11 классов';
+let FILE_OTHER=false;
+function isEntryQR(t){ t=String(t||''); return !extractCodes(t).length && !OTHER_RE.test(t) && !/#r=/.test(t) && (/sozvezdie/i.test(t) || t.indexOf(baseUrl())===0); }
+function scanText(t,added,dup){
+  if(added) return '✓ Результат добавлен. Всего: '+DASH.items.length+'. Можно сканировать следующего ученика.';
+  if(dup) return 'Этот результат уже есть.';
+  if(OTHER_RE.test(t)) return 'Это результат '+OTHER_NAME+'. Его нужно сканировать на странице «Результаты класса» того сайта.';
+  if(isEntryQR(t)) return 'Это QR для входа в тестирование. Сканируйте код с экрана ученика: кнопка «QR для учителя».';
+  if(extractCodes(t).length) return 'QR прочитан, но результат повреждён. Попросите ученика обновить страницу с планом и показать QR ещё раз.';
+  return 'Это не QR результата «Созвездия».';
+}
 function extractCodes(t){ return String(t).match(/K1[1-4][ia][0-2x][roygbv][0-9a-hx]+(?:\.[A-Za-z0-9_-]+)?/g)||[]; }
 function baseUrl(){ return location.origin+location.pathname; }
 function resultUrl(){ return baseUrl()+'#r='+encodeResult(S); }
@@ -588,26 +598,27 @@ after.dashboard=function(){
   if(SCAN.on) scanAttach();
 };
 async function dashFiles(fs){
+  FILE_OTHER=false;
   let c=[], noX=false, used=0;
   for(const f of fs){ if(!FILE_RE.test(f.name)) continue; used++; try{ c=c.concat(await fileCodes(f)); }catch(e){ if(e&&e.message==='noxlsx') noX=true; } }
   if(noX){ toast('Этот браузер не читает XLSX. Скачайте ответы формы в формате CSV.'); return; }
   if(!used){ toast('Нужен файл XLSX, CSV или JSON.'); return; }
   const r=dAdd(c); render();
-  toast(c.length?'Добавлено: '+r.a+(r.d?' · повторов: '+r.d:'')+(r.b?' · не распознано: '+r.b:''):'В файле не найдено результатов «Созвездия».');
+  toast(c.length?'Добавлено: '+r.a+(r.d?' · повторов: '+r.d:'')+(r.b?' · не распознано: '+r.b:''):(FILE_OTHER?'Это выгрузка '+OTHER_NAME+'. Загрузите её в «Результаты класса» того сайта.':'В файле не найдено результатов «Созвездия».'));
 }
 view.addEventListener('dragover',e=>{ if(S.screen==='dashboard') e.preventDefault(); });
 view.addEventListener('drop',e=>{ if(S.screen!=='dashboard') return; e.preventDefault(); dashFiles([...(e.dataTransfer?e.dataTransfer.files:[])]); });
 const SCAN={on:false,stream:null,raf:null,det:null,last:''};
 function loadScript(srcs){ return new Promise((res,rej)=>{ const l=[].concat(srcs); const nx=i=>{ if(i>=l.length) return rej(); const s=document.createElement('script'); s.src=l[i]; s.onload=res; s.onerror=()=>{s.remove();nx(i+1);}; document.head.appendChild(s); }; nx(0); }); }
-async function scanStart(){ try{ SCAN.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); }catch(e){ toast('Нет доступа к камере. Добавьте результаты файлами или ссылками.'); return; }
+async function scanStart(){ try{ SCAN.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}}); }catch(e){ toast('Нет доступа к камере. Добавьте результаты файлами или ссылками.'); return; }
   if('BarcodeDetector' in window){ try{ SCAN.det=new BarcodeDetector({formats:['qr_code']}); }catch(e){} }
   if(!SCAN.det&&!window.jsQR){ try{ await loadScript(['lib/jsqr.min.js','jsqr.min.js','https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js']); }catch(e){ toast('Не удалось загрузить сканер.'); scanStop(); return; } }
-  SCAN.on=true; render(); }
+  SCAN.note=''; SCAN.on=true; render(); }
 function scanAttach(){ const v=document.getElementById('scanVideo'); if(!v||!SCAN.stream) return; v.srcObject=SCAN.stream; v.play().catch(()=>{});
-  const c=document.createElement('canvas'), x=c.getContext('2d',{willReadFrequently:true}), msg=document.getElementById('scanMsg');
+  const c=document.createElement('canvas'), x=c.getContext('2d',{willReadFrequently:true}), msg=document.getElementById('scanMsg'); if(msg) msg.textContent=SCAN.note||'Камера включена. Наведите её на «QR для учителя» на экране ученика с расстояния 20–40 см.';
   const tick=async()=>{ if(!SCAN.on) return; if(v.readyState>=2){ let t='';
     try{ if(SCAN.det){ const r=await SCAN.det.detect(v); if(r[0]) t=r[0].rawValue; } else { c.width=v.videoWidth; c.height=v.videoHeight; x.drawImage(v,0,0); const r=window.jsQR(x.getImageData(0,0,c.width,c.height).data,c.width,c.height); if(r) t=r.data; } }catch(e){}
-    if(t&&t!==SCAN.last){ SCAN.last=t; const r=dAdd(extractCodes(t)); if(msg) msg.textContent=r.a?'✓ Добавлено. Всего: '+DASH.items.length:(r.d?'Этот результат уже есть':(isEntryQR(t)?'Это QR для входа в тестирование. Сканируйте код с экрана ученика: «QR для учителя».':'Это не QR результата')); if(r.a){ setTimeout(()=>{ if(SCAN.on) render(); },700); return; } } }
+    if(t&&t!==SCAN.last){ SCAN.last=t; const r=dAdd(extractCodes(t)); if(msg) msg.textContent=SCAN.note=scanText(t,r.a,r.d); if(r.a){ setTimeout(()=>{ if(SCAN.on) render(); },700); return; } } }
     SCAN.raf=requestAnimationFrame(tick); }; SCAN.raf=requestAnimationFrame(tick); }
 function scanStop(){ SCAN.on=false; cancelAnimationFrame(SCAN.raf); if(SCAN.stream) SCAN.stream.getTracks().forEach(t=>t.stop()); SCAN.stream=null; }
 function download(name,content,type){ const b=new Blob([content],{type}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500); }
