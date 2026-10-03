@@ -358,7 +358,7 @@ function decodeResult(str){ try{
   const picks=[...body.slice(p,p+2)].map(ch=>ch.charCodeAt(0)-96); p+=2;
   const skills=[...body.slice(p,p+ST.length)].map(x=>x==='x'?null:+x); p+=ST.length;
   const fbs=body.slice(p,p+DATA.feedback.length);
-  if(answers.length!==Q.length||answers.some((a,i)=>a==null||a>=Q[i].options.length)||picks.some(x=>!TR[x])||skills.length!==ST.length||skills.some(v=>v==null)||fbs.length!==DATA.feedback.length) return null;
+  if(answers.length!==Q.length||answers.every(a=>a==null)||answers.some((a,i)=>a!=null&&a>=Q[i].options.length)||picks.some(x=>!TR[x])||skills.length!==ST.length||skills.every(v=>v==null)||fbs.length!==DATA.feedback.length) return null;
   const fb={}; DATA.feedback.forEach((f,i)=>{ if(fbs[i]!=='x') fb[f.id]=+fbs[i]; });
   let e={}; if(ext){ try{ e=JSON.parse(unb64u(ext)); }catch(_){} }
   return {grade,school,before,hero,answers,picks,skills,fb,city:e.c||'',klass:e.k||'',code:m[0]};
@@ -547,6 +547,7 @@ function teacher(){ const link=baseUrl()+(S.klass?'?k='+encodeURIComponent(S.kla
   '<div class="row" style="margin-top:12px"><button class="btn green" data-act="dashboard">Открыть результаты класса</button><a class="btn white" href="'+esc(DATA.meta.collect.formAnswers)+'" target="_blank" rel="noopener">Ответы в Яндекс Форме</a></div></div>'; }
 
 /* ---------- дашборд ---------- */
+let STEP_LOCK=false;
 const DASH={items:[],fK:'',fG:''};
 function dLoad(){ try{ DASH.items=JSON.parse(localStorage.getItem('sozv-kids-dash')||'[]').map(decodeResult).filter(Boolean); }catch(e){} }
 function dSave(){ try{ localStorage.setItem('sozv-kids-dash',JSON.stringify(DASH.items.map(x=>x.code))); }catch(e){} }
@@ -660,9 +661,9 @@ view.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) re
   if(d.grade){ keep(); S.grade=+d.grade; render(); return; }
   if(d.school){ keep(); S.school=d.school; render(); return; }
   if(d.before!=null){ keep(); S.before=+d.before; render(); return; }
-  if(d.opt!=null){ S.answers[S.qi]=+d.opt; b.classList.add('sel'); flyBlock(b); setTimeout(()=>{ if(S.qi<Q.length-1){S.qi++; go('q');} else go('pick'); },REDUCED?60:360); return; }
+  if(d.opt!=null){ if(STEP_LOCK) return; STEP_LOCK=true; S.answers[S.qi]=+d.opt; b.classList.add('sel'); flyBlock(b); setTimeout(()=>{ STEP_LOCK=false; if(S.qi<Q.length-1){S.qi++; go('q');} else go('pick'); },REDUCED?60:360); return; }
   if(d.pick!=null){ const t=+d.pick; if(S.picks.includes(t)) S.picks=S.picks.filter(x=>x!==t); else if(S.picks.length<2) S.picks.push(t); const y=window.scrollY; render(); window.scrollTo(0,y); if(S.picks.length===2) flyBlock(b); return; }
-  if(d.val!=null){ S.skills[S.si]=+d.val; b.classList.add('sel'); flyBlock(b); setTimeout(()=>{ if(S.si<ST.length-1){S.si++; go('skill');} else { go('building'); setTimeout(()=>{ if(S.screen==='building') go('result'); },REDUCED?500:2200); } },REDUCED?60:320); return; }
+  if(d.val!=null){ if(STEP_LOCK) return; STEP_LOCK=true; S.skills[S.si]=+d.val; b.classList.add('sel'); flyBlock(b); setTimeout(()=>{ STEP_LOCK=false; if(S.si<ST.length-1){S.si++; go('skill');} else { go('building'); setTimeout(()=>{ if(S.screen==='building') go('result'); },REDUCED?500:2200); } },REDUCED?60:320); return; }
   if(d.fb){ S.fb[d.fb]=+d.fbv; const y=window.scrollY; render(); window.scrollTo(0,y); return; }
   switch(d.act){
     case 'start': newRun(); go('who'); break;
